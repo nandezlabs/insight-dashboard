@@ -24,14 +24,14 @@ TOTAL_COMMITS=0
 for PROJECT in *; do
     if [ -d "${PROJECT}/.git" ]; then
         cd "${PROJECT}"
-        
+
         COMMITS=$(git log --since="${DAYS} days ago" --oneline 2>/dev/null | wc -l | xargs)
-        
+
         if [ "${COMMITS}" -gt 0 ]; then
             printf "%-30s %5s commits\n" "${PROJECT}" "${COMMITS}"
             ((TOTAL_COMMITS+=COMMITS))
         fi
-        
+
         cd ..
     fi
 done

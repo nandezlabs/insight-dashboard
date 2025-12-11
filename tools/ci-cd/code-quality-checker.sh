@@ -55,12 +55,12 @@ print_section() {
 
 detect_project_type() {
     local project_dir="$1"
-    
+
     if [ ! -d "${project_dir}" ]; then
         echo "unknown"
         return 1
     fi
-    
+
     if [[ -f "${project_dir}/package.json" ]]; then
         echo "nodejs"
     elif [[ -f "${project_dir}/pyproject.toml" ]]; then
@@ -83,24 +83,24 @@ detect_project_type() {
 check_nodejs_quality() {
     local project_dir="$1"
     local fix="${2:-false}"
-    
+
     if [ ! -d "${project_dir}" ]; then
         print_error "Project directory not found: ${project_dir}"
         return 1
     fi
-    
+
     cd "${project_dir}"
-    
+
     local issues=0
-    
+
     # ESLint
     print_section "ESLint"
-    
+
     if [[ ! -d "node_modules" ]]; then
         print_info "Installing dependencies..."
         npm install
     fi
-    
+
     if grep -q '"lint"' package.json; then
         if [[ "$fix" == "true" ]]; then
             print_info "Running ESLint with --fix..."
@@ -122,10 +122,10 @@ check_nodejs_quality() {
     else
         print_warning "No lint script found"
     fi
-    
+
     # Prettier
     print_section "Prettier"
-    
+
     if command -v prettier >/dev/null 2>&1 || [[ -d "node_modules/.bin/prettier" ]]; then
         if [[ "$fix" == "true" ]]; then
             print_info "Running Prettier with --write..."
@@ -144,10 +144,10 @@ check_nodejs_quality() {
     else
         print_warning "Prettier not found"
     fi
-    
+
     # TypeScript
     print_section "TypeScript"
-    
+
     if [[ -f "tsconfig.json" ]]; then
         print_info "Type checking with TypeScript..."
         if npx tsc --noEmit; then
@@ -159,7 +159,7 @@ check_nodejs_quality() {
     else
         print_info "No TypeScript configuration found"
     fi
-    
+
     return $issues
 }
 
@@ -170,14 +170,14 @@ check_nodejs_quality() {
 check_python_quality() {
     local project_dir="$1"
     local fix="${2:-false}"
-    
+
     cd "$project_dir"
-    
+
     local issues=0
-    
+
     # Black
     print_section "Black (Formatter)"
-    
+
     if [[ "$fix" == "true" ]]; then
         print_info "Running Black..."
         if poetry run black .; then
@@ -192,10 +192,10 @@ check_python_quality() {
             ((issues++))
         fi
     fi
-    
+
     # isort
     print_section "isort (Import Sorting)"
-    
+
     if [[ "$fix" == "true" ]]; then
         print_info "Running isort..."
         if poetry run isort .; then
@@ -210,10 +210,10 @@ check_python_quality() {
             ((issues++))
         fi
     fi
-    
+
     # Flake8
     print_section "Flake8 (Linter)"
-    
+
     print_info "Running Flake8..."
     if poetry run flake8 .; then
         print_success "Flake8 passed"
@@ -221,10 +221,10 @@ check_python_quality() {
         print_error "Flake8 found issues"
         ((issues++))
     fi
-    
+
     # MyPy
     print_section "MyPy (Type Checker)"
-    
+
     print_info "Running MyPy..."
     if poetry run mypy .; then
         print_success "MyPy type checking passed"
@@ -232,10 +232,10 @@ check_python_quality() {
         print_error "MyPy found type errors"
         ((issues++))
     fi
-    
+
     # Bandit (Security)
     print_section "Bandit (Security)"
-    
+
     print_info "Running Bandit security scan..."
     if poetry run bandit -r . -ll; then
         print_success "Bandit security scan passed"
@@ -243,7 +243,7 @@ check_python_quality() {
         print_warning "Bandit found security issues"
         ((issues++))
     fi
-    
+
     return $issues
 }
 
@@ -254,14 +254,14 @@ check_python_quality() {
 check_rust_quality() {
     local project_dir="$1"
     local fix="${2:-false}"
-    
+
     cd "$project_dir"
-    
+
     local issues=0
-    
+
     # Rustfmt
     print_section "Rustfmt (Formatter)"
-    
+
     if [[ "$fix" == "true" ]]; then
         print_info "Running rustfmt..."
         if cargo fmt; then
@@ -276,10 +276,10 @@ check_rust_quality() {
             ((issues++))
         fi
     fi
-    
+
     # Clippy
     print_section "Clippy (Linter)"
-    
+
     print_info "Running Clippy..."
     if cargo clippy -- -D warnings; then
         print_success "Clippy passed"
@@ -287,10 +287,10 @@ check_rust_quality() {
         print_error "Clippy found issues"
         ((issues++))
     fi
-    
+
     # Cargo check
     print_section "Cargo Check"
-    
+
     print_info "Running cargo check..."
     if cargo check; then
         print_success "Cargo check passed"
@@ -298,7 +298,7 @@ check_rust_quality() {
         print_error "Cargo check failed"
         ((issues++))
     fi
-    
+
     return $issues
 }
 
@@ -309,14 +309,14 @@ check_rust_quality() {
 check_go_quality() {
     local project_dir="$1"
     local fix="${2:-false}"
-    
+
     cd "$project_dir"
-    
+
     local issues=0
-    
+
     # gofmt
     print_section "gofmt (Formatter)"
-    
+
     if [[ "$fix" == "true" ]]; then
         print_info "Running gofmt..."
         gofmt -w .
@@ -332,10 +332,10 @@ check_go_quality() {
             ((issues++))
         fi
     fi
-    
+
     # goimports
     print_section "goimports (Import Formatter)"
-    
+
     if command -v goimports >/dev/null 2>&1; then
         if [[ "$fix" == "true" ]]; then
             print_info "Running goimports..."
@@ -354,10 +354,10 @@ check_go_quality() {
     else
         print_warning "goimports not installed"
     fi
-    
+
     # go vet
     print_section "go vet (Static Analysis)"
-    
+
     print_info "Running go vet..."
     if go vet ./...; then
         print_success "go vet passed"
@@ -365,10 +365,10 @@ check_go_quality() {
         print_error "go vet found issues"
         ((issues++))
     fi
-    
+
     # golangci-lint
     print_section "golangci-lint (Comprehensive Linter)"
-    
+
     if command -v golangci-lint >/dev/null 2>&1; then
         if [[ "$fix" == "true" ]]; then
             print_info "Running golangci-lint with --fix..."
@@ -390,7 +390,7 @@ check_go_quality() {
     else
         print_warning "golangci-lint not installed"
     fi
-    
+
     return $issues
 }
 
@@ -401,14 +401,14 @@ check_go_quality() {
 check_swift_quality() {
     local project_dir="$1"
     local fix="${2:-false}"
-    
+
     cd "$project_dir"
-    
+
     local issues=0
-    
+
     # SwiftFormat
     print_section "SwiftFormat (Formatter)"
-    
+
     if command -v swiftformat >/dev/null 2>&1; then
         if [[ "$fix" == "true" ]]; then
             print_info "Running SwiftFormat..."
@@ -427,17 +427,17 @@ check_swift_quality() {
     else
         print_warning "SwiftFormat not installed"
     fi
-    
+
     # SwiftLint
     print_section "SwiftLint (Linter)"
-    
+
     if command -v swiftlint >/dev/null 2>&1; then
         if [[ "$fix" == "true" ]]; then
             print_info "Running SwiftLint with --fix..."
             if swiftlint --fix; then
                 print_success "SwiftLint auto-fixed issues"
             fi
-            
+
             # Still check for remaining issues
             if swiftlint; then
                 print_success "SwiftLint passed"
@@ -457,7 +457,7 @@ check_swift_quality() {
     else
         print_warning "SwiftLint not installed"
     fi
-    
+
     return $issues
 }
 
@@ -468,25 +468,25 @@ check_swift_quality() {
 check_all_workspace() {
     local workspace_dir="${1:-$HOME/Developer}"
     local fix="${2:-false}"
-    
+
     print_info "Scanning for projects in: $workspace_dir"
     echo ""
-    
+
     local check_count=0
     local pass_count=0
     local fail_count=0
-    
+
     # Find all git repositories
     while IFS= read -r project_dir; do
         local project_name=$(basename "$project_dir")
         local project_type=$(detect_project_type "$project_dir")
-        
+
         if [[ "$project_type" != "unknown" ]]; then
             echo ""
             print_info "Checking: $project_name ($project_type)"
-            
+
             ((check_count++))
-            
+
             if check_project_quality "$project_dir" "$fix"; then
                 ((pass_count++))
                 print_success "Quality checks passed"
@@ -496,7 +496,7 @@ check_all_workspace() {
             fi
         fi
     done < <(find "$workspace_dir" -name ".git" -type d -maxdepth 3 | sed 's/\/.git$//')
-    
+
     # Summary
     print_section "Quality Check Summary"
     echo "Total projects checked: $check_count"
@@ -511,9 +511,9 @@ check_all_workspace() {
 check_project_quality() {
     local project_dir="$1"
     local fix="${2:-false}"
-    
+
     local project_type=$(detect_project_type "$project_dir")
-    
+
     case $project_type in
         nodejs)
             check_nodejs_quality "$project_dir" "$fix"
@@ -543,25 +543,25 @@ check_project_quality() {
 
 interactive_mode() {
     local project_dir="${1:-.}"
-    
+
     project_dir=$(cd "$project_dir" && pwd)
-    
+
     local project_type=$(detect_project_type "$project_dir")
     local project_name=$(basename "$project_dir")
-    
+
     print_info "Project: $project_name"
     print_info "Type: $project_type"
     echo ""
-    
+
     echo -e "${CYAN}Quality Check Options:${NC}"
     echo "  1) Check code quality"
     echo "  2) Check and auto-fix issues"
     echo "  3) Check all workspace projects"
     echo "  q) Quit"
     echo ""
-    
+
     read -p "Selection: " choice
-    
+
     case $choice in
         1)
             check_project_quality "$project_dir" "false"
@@ -611,9 +611,9 @@ show_usage() {
 main() {
     local command="${1:-interactive}"
     local project_dir="${2:-.}"
-    
+
     print_header
-    
+
     case $command in
         check)
             project_dir=$(cd "$project_dir" && pwd)

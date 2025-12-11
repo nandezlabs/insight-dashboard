@@ -24,29 +24,29 @@ declare -A LANG_LINES
 for PROJECT in *; do
     if [ -d "${PROJECT}" ]; then
         cd "${PROJECT}"
-        
+
         # JavaScript/TypeScript
         JS_LINES=$(find . -type f \( -name "*.js" -o -name "*.jsx" \) \
             ! -path "*/node_modules/*" ! -path "*/dist/*" \
             -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
         [ -n "${JS_LINES}" ] && [ "${JS_LINES}" != "0" ] && ((LANG_LINES[JavaScript]+=${JS_LINES}))
-        
+
         TS_LINES=$(find . -type f \( -name "*.ts" -o -name "*.tsx" \) \
             ! -path "*/node_modules/*" ! -path "*/dist/*" \
             -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
         [ -n "${TS_LINES}" ] && [ "${TS_LINES}" != "0" ] && ((LANG_LINES[TypeScript]+=${TS_LINES}))
-        
+
         # Python
         PY_LINES=$(find . -type f -name "*.py" \
             ! -path "*/.venv/*" ! -path "*/venv/*" \
             -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
         [ -n "${PY_LINES}" ] && [ "${PY_LINES}" != "0" ] && ((LANG_LINES[Python]+=${PY_LINES}))
-        
+
         # Shell
         SH_LINES=$(find . -type f -name "*.sh" \
             -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
         [ -n "${SH_LINES}" ] && [ "${SH_LINES}" != "0" ] && ((LANG_LINES[Shell]+=${SH_LINES}))
-        
+
         cd ..
     fi
 done

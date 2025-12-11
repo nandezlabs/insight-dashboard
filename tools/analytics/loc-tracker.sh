@@ -22,7 +22,7 @@ TOTAL_LINES=0
 for PROJECT in *; do
     if [ -d "${PROJECT}" ]; then
         cd "${PROJECT}"
-        
+
         # Count lines (excluding node_modules, venv, etc.)
         LINES=$(find . -type f \
             \( -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" -o -name "*.py" -o -name "*.sh" \) \
@@ -32,12 +32,12 @@ for PROJECT in *; do
             ! -path "*/dist/*" \
             ! -path "*/build/*" \
             -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
-        
+
         if [ -n "${LINES}" ] && [ "${LINES}" -gt 0 ]; then
             printf "%-30s %10s lines\n" "${PROJECT}" "${LINES}"
             ((TOTAL_LINES+=LINES))
         fi
-        
+
         cd ..
     fi
 done

@@ -27,10 +27,10 @@ cd "${HOME}/Developer/projects"
 for PROJECT in *; do
     if [ -d "${PROJECT}" ]; then
         echo "  → ${PROJECT}"
-        
+
         # Create project directory
         mkdir -p "${BACKUP_PATH}/${PROJECT}"
-        
+
         # Copy only essential files
         rsync -av \
             --exclude="node_modules" \

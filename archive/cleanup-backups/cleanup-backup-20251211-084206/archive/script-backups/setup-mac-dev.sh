@@ -1,7 +1,8 @@
 #!/bin/bash
-set -euo pipefail
 # Mac Developer Environment - Full Setup Script
 # Sets up everything you need after a fresh macOS install or upgrade
+
+set -e
 
 # Colors
 GREEN='\033[0;32m'
@@ -16,8 +17,8 @@ echo -e "${BLUE}  nandezlabs Configuration${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
 
 # Check if running on macOS
-if [[ "${OSTYPE}" != "darwin"* ]]; then
-    echo -e "${RED}❌ This script is for macOS only${NC}" >&2
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    echo -e "${RED}❌ This script is for macOS only${NC}"
     exit 1
 fi
 
@@ -31,7 +32,7 @@ echo "  • Development tools"
 echo ""
 read -p "Continue? (y/n): " CONFIRM
 
-if [ "${CONFIRM}" != "y" ]; then
+if [ "$CONFIRM" != "y" ]; then
     echo "Cancelled."
     exit 0
 fi
@@ -49,11 +50,11 @@ if command_exists brew; then
 else
     echo -e "${YELLOW}📦 Installing Homebrew...${NC}"
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
+    
     # Add Homebrew to PATH
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
     eval "$(/opt/homebrew/bin/brew shellenv)"
-
+    
     echo -e "${GREEN}✅ Homebrew installed${NC}"
 fi
 
@@ -127,11 +128,11 @@ done
 echo -e "\n${BLUE}━━━ Step 6: VS Code Extensions ━━━${NC}\n"
 
 # Check if extensions backup exists
-BACKUP_DIR="$HOME/Developer/vscode-backup"
+BACKUP_DIR="$HOME/Desktop/workspace/vscode-backup"
 if [ -f "$BACKUP_DIR/extensions.txt" ]; then
     echo -e "${YELLOW}📦 Found extensions backup. Install from backup? (y/n):${NC} "
     read INSTALL_BACKUP
-
+    
     if [ "$INSTALL_BACKUP" = "y" ]; then
         while IFS= read -r extension; do
             echo "Installing: $extension"
@@ -141,7 +142,7 @@ if [ -f "$BACKUP_DIR/extensions.txt" ]; then
     fi
 else
     echo -e "${YELLOW}Installing essential extensions...${NC}"
-
+    
     EXTENSIONS=(
         "rangav.vscode-thunder-client"
         "eamodio.gitlens"
@@ -160,12 +161,12 @@ else
         "mtxr.sqltools"
         "humao.rest-client"
     )
-
+    
     for ext in "${EXTENSIONS[@]}"; do
         echo "Installing: $ext"
         code --install-extension "$ext" --force
     done
-
+    
     echo -e "${GREEN}✅ Essential extensions installed${NC}"
 fi
 
@@ -205,8 +206,8 @@ alias ll='exa -la --icons'
 alias cat='bat'
 alias grep='rg'
 alias find='fd'
-alias code-backup='~/Developer/manage-vscode.sh'
-alias new-project='~/Developer/create-project.sh'
+alias code-backup='~/Desktop/workspace/manage-vscode.sh'
+alias new-project='~/Desktop/workspace/create-project.sh'
 
 # Git shortcuts
 alias gs='git status'
@@ -216,8 +217,8 @@ alias gp='git push'
 alias gl='git log --oneline --graph --all'
 
 # Quick navigation
-alias workspace='cd ~/Developer'
-alias insight='cd ~/Developer/Insight'
+alias workspace='cd ~/Desktop/workspace'
+alias insight='cd ~/Desktop/workspace/Insight'
 
 EOF
     echo -e "${GREEN}✅ Shell aliases added${NC}"
@@ -227,7 +228,7 @@ fi
 
 echo -e "\n${BLUE}━━━ Step 9: Create Workspace Structure ━━━${NC}\n"
 
-WORKSPACE_DIR="$HOME/Developer"
+WORKSPACE_DIR="$HOME/Desktop/workspace"
 mkdir -p "$WORKSPACE_DIR"
 mkdir -p "$WORKSPACE_DIR/production"
 mkdir -p "$WORKSPACE_DIR/learning"
@@ -241,9 +242,9 @@ echo -e "\n${BLUE}━━━ Step 10: VS Code Settings Sync ━━━${NC}\n"
 if [ -f "$BACKUP_DIR/settings.json" ]; then
     echo -e "${YELLOW}Restore VS Code settings from backup? (y/n):${NC} "
     read RESTORE_SETTINGS
-
+    
     if [ "$RESTORE_SETTINGS" = "y" ]; then
-        ~/Developer/manage-vscode.sh
+        ~/Desktop/workspace/manage-vscode.sh
     fi
 fi
 

@@ -1,7 +1,8 @@
 #!/bin/bash
-set -euo pipefail
 # NAS Deploy - Deploy projects to self-hosted production on NAS
 # Usage: ./nas-deploy.sh <project-name> <environment>
+
+set -e
 
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -10,20 +11,19 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # Load NAS config
-if [ -f ~/Developer/nas-config.txt ]; then
-    # shellcheck disable=SC1091
-    source ~/Developer/nas-config.txt
+if [ -f ~/Desktop/workspace/nas-config.txt ]; then
+    source ~/Desktop/workspace/nas-config.txt
 else
-    echo -e "${RED}❌ NAS not configured. Run setup-nas.sh first${NC}" >&2
+    echo -e "${RED}❌ NAS not configured. Run setup-nas.sh first${NC}"
     exit 1
 fi
 
 # Parse arguments
-PROJECT_NAME="${1:-}"
-ENVIRONMENT="${2:-production}"
+PROJECT_NAME=${1:-}
+ENVIRONMENT=${2:-production}
 
-if [ -z "${PROJECT_NAME}" ]; then
-    echo -e "${RED}Usage: ./nas-deploy.sh <project-name> [environment]${NC}" >&2
+if [ -z "$PROJECT_NAME" ]; then
+    echo -e "${RED}Usage: ./nas-deploy.sh <project-name> [environment]${NC}"
     echo ""
     echo "Examples:"
     echo "  ./nas-deploy.sh Insight production"
@@ -33,8 +33,8 @@ if [ -z "${PROJECT_NAME}" ]; then
 fi
 
 # Check if project exists
-if [ ! -d ~/Developer/${PROJECT_NAME} ]; then
-    echo -e "${RED}❌ Project not found: ~/Developer/${PROJECT_NAME}${NC}" >&2
+if [ ! -d ~/Desktop/workspace/$PROJECT_NAME ]; then
+    echo -e "${RED}❌ Project not found: ~/Desktop/workspace/$PROJECT_NAME${NC}"
     exit 1
 fi
 
@@ -58,7 +58,7 @@ rsync -avz --delete \
     --exclude='.git' \
     --exclude='.env.local' \
     --exclude='.DS_Store' \
-    ~/Developer/$PROJECT_NAME/ \
+    ~/Desktop/workspace/$PROJECT_NAME/ \
     $NAS_USER@$NAS_IP:$PROJECT_DIR/
 
 echo -e "${GREEN}✅ Project synced${NC}"
@@ -67,20 +67,20 @@ echo -e "${GREEN}✅ Project synced${NC}"
 echo -e "\n${YELLOW}Step 2: Building project on NAS...${NC}\n"
 
 # Detect project type
-if [ -f ~/Developer/$PROJECT_NAME/package.json ]; then
+if [ -f ~/Desktop/workspace/$PROJECT_NAME/package.json ]; then
     echo "Node.js project detected"
-
+    
     # Install dependencies
     sshpass -p "$NAS_PASS" ssh $NAS_USER@$NAS_IP << EOF
         cd $PROJECT_DIR
         npm install --production
-
+        
         # Build if build script exists
         if grep -q '"build"' package.json; then
             npm run build
         fi
 EOF
-
+    
     echo -e "${GREEN}✅ Build complete${NC}"
 else
     echo -e "${YELLOW}⚠️  No package.json found, skipping build${NC}"
@@ -90,9 +90,9 @@ fi
 echo -e "\n${YELLOW}Step 3: Creating Docker container...${NC}\n"
 
 # Generate Dockerfile if not exists
-if [ ! -f ~/Developer/$PROJECT_NAME/Dockerfile ]; then
+if [ ! -f ~/Desktop/workspace/$PROJECT_NAME/Dockerfile ]; then
     echo "Generating Dockerfile..."
-
+    
     sshpass -p "$NAS_PASS" ssh $NAS_USER@$NAS_IP << 'EOF'
 cat > $PROJECT_DIR/Dockerfile << 'DOCKERFILE'
 FROM node:18-alpine
@@ -125,14 +125,14 @@ IMAGE_NAME="${PROJECT_NAME,,}:${ENVIRONMENT}"
 
 sshpass -p "$NAS_PASS" ssh $NAS_USER@$NAS_IP << EOF
     cd $PROJECT_DIR
-
+    
     # Stop existing container
     docker stop $CONTAINER_NAME 2>/dev/null || true
     docker rm $CONTAINER_NAME 2>/dev/null || true
-
+    
     # Build new image
     docker build -t $IMAGE_NAME .
-
+    
     # Run container
     docker run -d \
         --name $CONTAINER_NAME \
@@ -211,7 +211,7 @@ echo "  3. Update .env files with NAS database URLs"
 echo ""
 
 # Save deployment info
-cat > ~/Developer/${PROJECT_NAME}-deployment.txt << EOF
+cat > ~/Desktop/workspace/${PROJECT_NAME}-deployment.txt << EOF
 Deployment: $PROJECT_NAME ($ENVIRONMENT)
 Date: $(date)
 Container: $CONTAINER_NAME
@@ -226,4 +226,4 @@ AI:
   Ollama: http://$NAS_IP:11434
 EOF
 
-echo -e "${GREEN}Deployment info saved: ~/Developer/${PROJECT_NAME}-deployment.txt${NC}\n"
+echo -e "${GREEN}Deployment info saved: ~/Desktop/workspace/${PROJECT_NAME}-deployment.txt${NC}\n"

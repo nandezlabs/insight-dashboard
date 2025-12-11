@@ -100,17 +100,17 @@ get_dir_size() {
 remove_item() {
     local path="$1"
     local size=0
-    
+
     if [ ! -e "${path}" ]; then
         return
     fi
-    
+
     if [ -d "${path}" ]; then
         size=$(get_dir_size "${path}")
     elif [ -f "${path}" ]; then
         size=$(stat -f%z "${path}" 2>/dev/null || echo 0)
     fi
-    
+
     if [ "${DRY_RUN}" = true ]; then
         info "Would remove: ${path} ($(bytes_to_human "${size}"))"
     else
@@ -136,30 +136,30 @@ remove_item() {
 
 consolidate_archives() {
     print_section "Consolidating Archive Data"
-    
+
     local archive_dir="$DEVELOPER_DIR/archive/script-backups"
-    
+
     if [ ! -d "$archive_dir" ]; then
         info "No archive directory found"
         return
     fi
-    
+
     info "Comparing archive versions with current tools..."
     echo ""
-    
+
     local safe_to_remove=()
     local need_review=()
     local unique_files=()
-    
+
     # Compare each archived file
     for archived_file in "$archive_dir"/*; do
         if [ ! -f "$archived_file" ]; then
             continue
         fi
-        
+
         local filename=$(basename "$archived_file")
         local current_file=$(find "$DEVELOPER_DIR/tools" "$DEVELOPER_DIR/docs" -name "$filename" -type f 2>/dev/null | head -1)
-        
+
         if [ -z "$current_file" ]; then
             # No current version exists - file is unique
             unique_files+=("$archived_file")
@@ -168,7 +168,7 @@ consolidate_archives() {
             # Compare dates
             local archive_date=$(stat -f%m "$archived_file" 2>/dev/null)
             local current_date=$(stat -f%m "$current_file" 2>/dev/null)
-            
+
             if [ "$current_date" -gt "$archive_date" ]; then
                 # Current is newer
                 if diff -q "$archived_file" "$current_file" >/dev/null 2>&1; then
@@ -195,9 +195,9 @@ consolidate_archives() {
             fi
         fi
     done
-    
+
     echo ""
-    
+
     # Report findings
     if [ ${#safe_to_remove[@]} -gt 0 ]; then
         success "${#safe_to_remove[@]} archived files safe to remove (current versions newer/identical)"
@@ -207,7 +207,7 @@ consolidate_archives() {
             done
         fi
     fi
-    
+
     if [ ${#unique_files[@]} -gt 0 ]; then
         echo ""
         warning "${#unique_files[@]} unique files in archive (no current version):"
@@ -216,7 +216,7 @@ consolidate_archives() {
         done
         info "These files are preserved in archive"
     fi
-    
+
     if [ ${#need_review[@]} -gt 0 ]; then
         echo ""
         error "${#need_review[@]} files need manual review:"
@@ -234,33 +234,33 @@ consolidate_archives() {
 
 compare_archived_files() {
     print_section "Comparing Archived Files with Current Versions"
-    
+
     local archive_dir="$DEVELOPER_DIR/archive/script-backups"
-    
+
     if [ ! -d "$archive_dir" ]; then
         error "No archive directory found"
         return
     fi
-    
+
     for archived_file in "$archive_dir"/*; do
         if [ ! -f "$archived_file" ]; then
             continue
         fi
-        
+
         local filename=$(basename "$archived_file")
         local current_file=$(find "$DEVELOPER_DIR/tools" "$DEVELOPER_DIR/docs" -name "$filename" -type f 2>/dev/null | head -1)
-        
+
         if [ -z "$current_file" ]; then
             info "No current version: $filename (unique to archive)"
             continue
         fi
-        
+
         echo ""
         echo -e "${YELLOW}═══ $filename ═══${NC}"
         echo "Archive: $archived_file"
         echo "Current: $current_file"
         echo ""
-        
+
         if diff -q "$archived_file" "$current_file" >/dev/null 2>&1; then
             success "Files are IDENTICAL"
         else
@@ -273,39 +273,39 @@ compare_archived_files() {
 
 backup_before_cleanup() {
     print_section "Creating Safety Backup"
-    
+
     local backup_dir="$DEVELOPER_DIR/.cleanup-backup-$(date +%Y%m%d-%H%M%S)"
-    
+
     mkdir -p "$backup_dir"
-    
+
     # Backup archive folder
     if [ -d "$DEVELOPER_DIR/archive" ]; then
         cp -R "$DEVELOPER_DIR/archive" "$backup_dir/"
         success "Backed up archive to: $backup_dir"
     fi
-    
+
     info "Backup location: $backup_dir"
     warning "This backup will be kept for 7 days"
 }
 
 cleanup_old_backups() {
     print_section "Cleaning Old Safety Backups"
-    
+
     local count=0
-    
+
     # Remove backups older than 7 days
     for backup in "$DEVELOPER_DIR"/.cleanup-backup-*; do
         if [ -d "$backup" ]; then
             local backup_date=$(basename "$backup" | sed 's/.cleanup-backup-//')
             local age_days=$(( ($(date +%s) - $(date -j -f "%Y%m%d-%H%M%S" "$backup_date" +%s 2>/dev/null || echo 0)) / 86400 ))
-            
+
             if [ "$age_days" -gt 7 ]; then
                 remove_item "$backup"
                 count=$((count + 1))
             fi
         fi
     done
-    
+
     if [ $count -gt 0 ]; then
         success "Removed $count old backups (>7 days)"
     else
@@ -319,57 +319,57 @@ cleanup_old_backups() {
 
 cleanup_macos_files() {
     print_section "Cleaning macOS System Files"
-    
+
     local count=0
-    
+
     # .DS_Store files
     while IFS= read -r file; do
         remove_item "$file"
         count=$((count + 1))
     done < <(find "$DEVELOPER_DIR" -name ".DS_Store" -type f 2>/dev/null)
-    
+
     # ._* resource fork files
     while IFS= read -r file; do
         remove_item "$file"
         count=$((count + 1))
     done < <(find "$DEVELOPER_DIR" -name "._*" -type f 2>/dev/null)
-    
+
     success "Cleaned $count macOS system files"
 }
 
 cleanup_empty_directories() {
     print_section "Removing Empty Directories"
-    
+
     local count=0
     local protected_dirs=(".git" "node_modules" "__pycache__" ".venv")
-    
+
     # Find empty directories (excluding protected ones)
     while IFS= read -r dir; do
         local basename=$(basename "$dir")
         local skip=false
-        
+
         for protected in "${protected_dirs[@]}"; do
             if [[ "$dir" == *"$protected"* ]]; then
                 skip=true
                 break
             fi
         done
-        
+
         if [ "$skip" = false ]; then
             remove_item "$dir"
             count=$((count + 1))
         fi
     done < <(find "$DEVELOPER_DIR" -type d -empty 2>/dev/null | grep -v "\.git")
-    
+
     success "Removed $count empty directories"
 }
 
 cleanup_temp_files() {
     print_section "Cleaning Temporary Files"
-    
+
     local patterns=("*.tmp" "*.temp" "*.log" "*.bak" "*.swp" "*.swo" "*~" "*.orig")
     local count=0
-    
+
     for pattern in "${patterns[@]}"; do
         while IFS= read -r file; do
             # Skip files in archive and certain project directories
@@ -380,16 +380,16 @@ cleanup_temp_files() {
             count=$((count + 1))
         done < <(find "$DEVELOPER_DIR" -name "$pattern" -type f 2>/dev/null)
     done
-    
+
     success "Cleaned $count temporary files"
 }
 
 cleanup_build_artifacts() {
     print_section "Cleaning Build Artifacts"
-    
+
     local dirs=("dist" "build" ".next" ".nuxt" "out" "target" ".cache" ".parcel-cache")
     local count=0
-    
+
     for dir_name in "${dirs[@]}"; do
         while IFS= read -r dir; do
             # Skip archive and template directories
@@ -400,44 +400,44 @@ cleanup_build_artifacts() {
             count=$((count + 1))
         done < <(find "$DEVELOPER_DIR" -name "$dir_name" -type d 2>/dev/null | grep -v "node_modules")
     done
-    
+
     success "Cleaned $count build artifact directories"
 }
 
 cleanup_node_modules() {
     print_section "Analyzing node_modules (Safe Mode)"
-    
+
     info "Scanning for node_modules directories..."
     local modules=()
     local total_size=0
-    
+
     while IFS= read -r dir; do
         # Skip archive and templates
         if [[ "$dir" == *"/archive/"* ]] || [[ "$dir" == *"/templates/"* ]]; then
             continue
         fi
-        
+
         local size=$(get_dir_size "$dir")
         total_size=$((total_size + size))
         modules+=("$dir:$size")
     done < <(find "$DEVELOPER_DIR/projects" -name "node_modules" -type d -maxdepth 4 2>/dev/null)
-    
+
     if [ ${#modules[@]} -eq 0 ]; then
         info "No node_modules found in active projects"
         return
     fi
-    
+
     echo ""
     info "Found ${#modules[@]} node_modules directories (Total: $(bytes_to_human $total_size))"
     echo ""
-    
+
     for module in "${modules[@]}"; do
         local dir="${module%%:*}"
         local size="${module##*:}"
         local project_dir=$(dirname "$dir")
         echo "  📦 $(basename "$(dirname "$dir")"): $(bytes_to_human $size)"
     done
-    
+
     echo ""
     warning "Use 'npm install' or 'yarn install' to reinstall dependencies"
     info "To clean specific project: cd <project> && rm -rf node_modules && npm install"
@@ -445,9 +445,9 @@ cleanup_node_modules() {
 
 cleanup_python_artifacts() {
     print_section "Cleaning Python Artifacts"
-    
+
     local count=0
-    
+
     # __pycache__ directories
     while IFS= read -r dir; do
         if [[ "$dir" != *"/archive/"* ]]; then
@@ -455,7 +455,7 @@ cleanup_python_artifacts() {
             count=$((count + 1))
         fi
     done < <(find "$DEVELOPER_DIR" -name "__pycache__" -type d 2>/dev/null)
-    
+
     # .pyc files
     while IFS= read -r file; do
         if [[ "$file" != *"/archive/"* ]]; then
@@ -463,7 +463,7 @@ cleanup_python_artifacts() {
             count=$((count + 1))
         fi
     done < <(find "$DEVELOPER_DIR" -name "*.pyc" -type f 2>/dev/null)
-    
+
     # .pyo files
     while IFS= read -r file; do
         if [[ "$file" != *"/archive/"* ]]; then
@@ -471,21 +471,21 @@ cleanup_python_artifacts() {
             count=$((count + 1))
         fi
     done < <(find "$DEVELOPER_DIR" -name "*.pyo" -type f 2>/dev/null)
-    
+
     success "Cleaned $count Python artifacts"
 }
 
 cleanup_git_artifacts() {
     print_section "Cleaning Git Artifacts"
-    
+
     local count=0
-    
+
     # .git/gc.log files
     while IFS= read -r file; do
         remove_item "$file"
         count=$((count + 1))
     done < <(find "$DEVELOPER_DIR" -path "*/.git/gc.log" -type f 2>/dev/null)
-    
+
     # Git LFS cache (can be large)
     if [ -d "$HOME/.git-lfs" ]; then
         local size=$(get_dir_size "$HOME/.git-lfs/cache")
@@ -494,22 +494,22 @@ cleanup_git_artifacts() {
             warning "Run 'git lfs prune' to clean LFS cache manually"
         fi
     fi
-    
+
     success "Cleaned $count Git artifacts"
 }
 
 cleanup_duplicates() {
     print_section "Finding Duplicate Files"
-    
+
     info "Scanning for duplicate documentation files..."
-    
+
     # Check for duplicate READMEs and guides
     local docs_to_check=("MAC-SETUP-GUIDE.md" "NAS-SETUP-GUIDE.md" "README.md")
     local found_duplicates=false
-    
+
     for doc in "${docs_to_check[@]}"; do
         local files=($(find "$DEVELOPER_DIR" -name "$doc" -type f 2>/dev/null | grep -v "node_modules" | grep -v "archive"))
-        
+
         if [ ${#files[@]} -gt 1 ]; then
             found_duplicates=true
             warning "Found ${#files[@]} copies of $doc:"
@@ -520,7 +520,7 @@ cleanup_duplicates() {
             echo ""
         fi
     done
-    
+
     if [ "$found_duplicates" = false ]; then
         success "No obvious duplicate documentation found"
     fi
@@ -528,12 +528,12 @@ cleanup_duplicates() {
 
 analyze_large_directories() {
     print_section "Analyzing Large Directories"
-    
+
     info "Finding directories over 100MB..."
     echo ""
-    
+
     local large_dirs=()
-    
+
     # Check major directories
     for dir in "$DEVELOPER_DIR"/*; do
         if [ -d "$dir" ]; then
@@ -544,17 +544,17 @@ analyze_large_directories() {
             fi
         fi
     done
-    
+
     # Sort by size (descending)
     IFS=$'\n' large_dirs=($(sort -t: -k2 -rn <<<"${large_dirs[*]}"))
     unset IFS
-    
+
     for item in "${large_dirs[@]}"; do
         local name="${item%%:*}"
         local size="${item##*:}"
         echo "  📁 $name: $(bytes_to_human $size)"
     done
-    
+
     if [ ${#large_dirs[@]} -eq 0 ]; then
         success "No directories over 100MB found"
     fi
@@ -563,16 +563,16 @@ analyze_large_directories() {
 cleanup_logs_older_than() {
     local days=${1:-30}
     print_section "Cleaning Logs Older Than $days Days"
-    
+
     local count=0
-    
+
     while IFS= read -r file; do
         if [[ "$file" != *"/archive/"* ]]; then
             remove_item "$file"
             count=$((count + 1))
         fi
     done < <(find "$DEVELOPER_DIR" -name "*.log" -type f -mtime +$days 2>/dev/null)
-    
+
     success "Cleaned $count old log files"
 }
 
@@ -582,7 +582,7 @@ cleanup_logs_older_than() {
 
 cleanup_quick() {
     print_header "Quick Cleanup"
-    
+
     cleanup_macos_files
     cleanup_temp_files
     cleanup_empty_directories
@@ -590,7 +590,7 @@ cleanup_quick() {
 
 cleanup_standard() {
     print_header "Standard Cleanup"
-    
+
     cleanup_macos_files
     cleanup_temp_files
     cleanup_empty_directories
@@ -601,7 +601,7 @@ cleanup_standard() {
 
 cleanup_deep() {
     print_header "Deep Cleanup"
-    
+
     backup_before_cleanup
     cleanup_macos_files
     cleanup_temp_files
@@ -618,7 +618,7 @@ cleanup_deep() {
 
 cleanup_safe() {
     print_header "Safe Cleanup with Data Consolidation"
-    
+
     backup_before_cleanup
     consolidate_archives
     cleanup_macos_files
@@ -630,9 +630,9 @@ cleanup_safe() {
 
 cleanup_analysis_only() {
     print_header "Cleanup Analysis (No Changes)"
-    
+
     DRY_RUN=true
-    
+
     analyze_large_directories
     cleanup_node_modules
     cleanup_duplicates
@@ -644,7 +644,7 @@ cleanup_analysis_only() {
 
 interactive_mode() {
     print_header "Interactive Cleanup Workflow"
-    
+
     echo "Select cleanup mode:"
     echo ""
     echo "  1) Safe     - Backup + consolidate archives + basic cleanup (safest)"
@@ -656,7 +656,7 @@ interactive_mode() {
     echo "  7) Custom   - Choose specific cleanup tasks"
     echo ""
     read -p "Enter choice (1-7): " choice
-    
+
     case $choice in
         1) cleanup_safe ;;
         2) cleanup_quick ;;
@@ -671,7 +671,7 @@ interactive_mode() {
 
 custom_cleanup() {
     print_header "Custom Cleanup"
-    
+
     echo "Select cleanup tasks (space-separated numbers):"
     echo ""
     echo "  1) Create safety backup"
@@ -688,7 +688,7 @@ custom_cleanup() {
     echo "  12) Clean old backups (>7 days)"
     echo ""
     read -p "Tasks: " -a tasks
-    
+
     for task in "${tasks[@]}"; do
         case $task in
             1) backup_before_cleanup ;;
@@ -719,9 +719,9 @@ generate_report() {
     local duration=$((end_time - START_TIME))
     local duration_min=$((duration / 60))
     local duration_sec=$((duration % 60))
-    
+
     mkdir -p "$REPORT_DIR"
-    
+
     cat > "$report_file" << EOF
 ╔══════════════════════════════════════════════════════════════════╗
 ║              Developer Folder Cleanup Report                     ║
@@ -779,23 +779,23 @@ NEXT STEPS
 Report saved to: $report_file
 
 EOF
-    
+
     echo "$report_file"
 }
 
 show_statistics() {
     print_section "Cleanup Statistics"
-    
+
     echo ""
     echo -e "  ${CYAN}Files Removed:${NC}      $FILES_REMOVED"
     echo -e "  ${CYAN}Directories Removed:${NC} $DIRS_REMOVED"
     echo -e "  ${CYAN}Space Freed:${NC}        $(bytes_to_human $TOTAL_SPACE_FREED)"
     echo ""
-    
+
     # Show current disk usage
     local available=$(df -h "$DEVELOPER_DIR" | awk 'NR==2 {print $4}')
     success "Available disk space: $available"
-    
+
     # Generate report
     if [ "$SCHEDULED" = true ] || [ "$GENERATE_REPORT" = true ]; then
         echo ""
@@ -850,7 +850,7 @@ EOF
 
 main() {
     local mode="interactive"
-    
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -889,13 +889,13 @@ main() {
                 ;;
         esac
     done
-    
+
     # Verify developer directory exists
     if [ ! -d "$DEVELOPER_DIR" ]; then
         error "Directory not found: $DEVELOPER_DIR"
         exit 1
     fi
-    
+
     echo ""
     echo -e "${MAGENTA}╔══════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${MAGENTA}║${NC}                   ${CYAN}Cleanup Workflow${NC}                            ${MAGENTA}║${NC}"
@@ -903,14 +903,14 @@ main() {
     echo -e "${MAGENTA}║${NC} Developer Folder Maintenance & Optimization                   ${MAGENTA}║${NC}"
     echo -e "${MAGENTA}╚══════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
-    
+
     if [ "$DRY_RUN" = true ]; then
         warning "DRY RUN MODE - No files will be deleted"
     fi
-    
+
     info "Working directory: $DEVELOPER_DIR"
     echo ""
-    
+
     # Execute selected mode
     case $mode in
         safe)
@@ -935,12 +935,12 @@ main() {
             interactive_mode
             ;;
     esac
-    
+
     # Show statistics
     if [ "$DRY_RUN" = false ]; then
         show_statistics
     fi
-    
+
     echo ""
     success "Cleanup completed!"
     echo ""

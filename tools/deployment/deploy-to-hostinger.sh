@@ -37,7 +37,7 @@ print_info() {
 
 check_requirements() {
     print_info "Checking requirements..."
-    
+
     # Check for lftp (best SFTP client for scripting)
     if ! command -v lftp &> /dev/null; then
         print_error "lftp not found. Installing..."
@@ -48,7 +48,7 @@ check_requirements() {
             exit 1
         fi
     fi
-    
+
     print_success "lftp $(lftp --version | head -1 | awk '{print $4}')"
 }
 
@@ -58,7 +58,7 @@ check_requirements() {
 
 load_config() {
     local config_file=".hostinger-config"
-    
+
     if [[ ! -f "${config_file}" ]]; then
         print_error "No .hostinger-config file found!"
         print_info "Creating template configuration..."
@@ -66,18 +66,18 @@ load_config() {
         print_error "Please edit .hostinger-config with your Hostinger credentials"
         exit 1
     fi
-    
+
     # Source the config file
     # shellcheck disable=SC1090
     source "${config_file}"
-    
+
     # Validate required variables
     if [[ -z "${HOSTINGER_HOST:-}" ]] || [[ -z "${HOSTINGER_USER:-}" ]] || [[ -z "${HOSTINGER_PASSWORD:-}" ]]; then
         print_error "Missing required configuration in .hostinger-config"
         print_error "Required: HOSTINGER_HOST, HOSTINGER_USER, HOSTINGER_PASSWORD"
         exit 1
     fi
-    
+
     print_success "Configuration loaded"
 }
 
@@ -112,7 +112,7 @@ EXCLUDE_FILES=".git node_modules .env .DS_Store"
 # Backup before deploy (yes/no)
 CREATE_BACKUP="yes"
 EOF
-    
+
     print_success ".hostinger-config template created"
 }
 
@@ -138,9 +138,9 @@ detect_project_type() {
 
 build_project() {
     local project_type="${PROJECT_TYPE:-$(detect_project_type)}"
-    
+
     print_info "Building project (type: $project_type)..."
-    
+
     case $project_type in
         nextjs)
             if [[ -f "package.json" ]]; then
@@ -177,13 +177,13 @@ build_project() {
             LOCAL_BUILD_DIR="${LOCAL_BUILD_DIR:-.}"
             ;;
     esac
-    
+
     # Verify build directory exists
     if [[ ! -d "$LOCAL_BUILD_DIR" ]]; then
         print_error "Build directory not found: $LOCAL_BUILD_DIR"
         exit 1
     fi
-    
+
     print_success "Project built successfully"
 }
 
@@ -195,19 +195,19 @@ create_backup() {
     if [[ "$CREATE_BACKUP" != "yes" ]]; then
         return 0
     fi
-    
+
     print_info "Creating backup of remote files..."
-    
+
     local backup_dir="backups/hostinger-$(date +%Y%m%d-%H%M%S)"
     mkdir -p "$backup_dir"
-    
+
     lftp -u "$HOSTINGER_USER,$HOSTINGER_PASSWORD" "sftp://$HOSTINGER_HOST" << EOF
 set sftp:auto-confirm yes
 set ssl:verify-certificate no
 mirror --verbose "$REMOTE_DIR" "$backup_dir"
 quit
 EOF
-    
+
     if [[ $? -eq 0 ]]; then
         print_success "Backup created: $backup_dir"
     else
@@ -221,16 +221,16 @@ EOF
 
 deploy_via_sftp() {
     print_info "Deploying to Hostinger via SFTP..."
-    
+
     # Build exclude pattern for lftp
     local exclude_pattern=""
     for pattern in $EXCLUDE_FILES; do
         exclude_pattern="$exclude_pattern --exclude $pattern"
     done
-    
+
     print_info "Uploading from: $LOCAL_BUILD_DIR"
     print_info "Remote directory: $REMOTE_DIR"
-    
+
     # Use lftp for reliable SFTP upload with mirror
     lftp -u "$HOSTINGER_USER,$HOSTINGER_PASSWORD" "sftp://$HOSTINGER_HOST" << EOF
 set sftp:auto-confirm yes
@@ -240,7 +240,7 @@ cd "$REMOTE_DIR"
 mirror --reverse --delete --verbose $exclude_pattern "$LOCAL_BUILD_DIR" .
 quit
 EOF
-    
+
     if [[ $? -eq 0 ]]; then
         print_success "Deployment completed successfully!"
     else
@@ -255,7 +255,7 @@ EOF
 
 set_permissions() {
     print_info "Setting file permissions..."
-    
+
     # Set proper permissions for PHP/web files
     lftp -u "$HOSTINGER_USER,$HOSTINGER_PASSWORD" "sftp://$HOSTINGER_HOST" << 'EOF'
 set sftp:auto-confirm yes
@@ -267,13 +267,13 @@ find . -type d -exec chmod 755 {} \;
 find . -type f -exec chmod 644 {} \;
 quit
 EOF
-    
+
     print_success "Permissions set"
 }
 
 verify_deployment() {
     print_info "Verifying deployment..."
-    
+
     # Check if index.html or index.php exists
     lftp -u "$HOSTINGER_USER,$HOSTINGER_PASSWORD" "sftp://$HOSTINGER_HOST" << EOF > /tmp/hostinger_verify.txt
 set sftp:auto-confirm yes
@@ -282,13 +282,13 @@ cd "$REMOTE_DIR"
 ls -la
 quit
 EOF
-    
+
     if grep -q "index\." /tmp/hostinger_verify.txt; then
         print_success "Deployment verified - index file found"
     else
         print_error "Warning: No index file found in $REMOTE_DIR"
     fi
-    
+
     rm -f /tmp/hostinger_verify.txt
 }
 
@@ -317,7 +317,7 @@ main() {
     local do_build=false
     local do_backup=true
     local dry_run=false
-    
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -349,23 +349,23 @@ main() {
                 ;;
         esac
     done
-    
+
     print_header
     check_requirements
     load_config
-    
+
     # Build if requested
     if [[ "$do_build" == true ]]; then
         build_project
     fi
-    
+
     # Verify build directory exists
     if [[ ! -d "$LOCAL_BUILD_DIR" ]]; then
         print_error "Build directory not found: $LOCAL_BUILD_DIR"
         print_info "Run with --build to build the project first"
         exit 1
     fi
-    
+
     # Show deployment info
     echo -e "\n${BLUE}Deployment Configuration:${NC}\n"
     echo "  Project Type: ${PROJECT_TYPE:-auto-detect}"
@@ -375,7 +375,7 @@ main() {
     echo "  User:         $HOSTINGER_USER"
     echo "  Backup:       $([ "$do_backup" == true ] && echo "yes" || echo "no")"
     echo ""
-    
+
     if [[ "$dry_run" == true ]]; then
         print_info "DRY RUN - showing files that would be uploaded..."
         find "$LOCAL_BUILD_DIR" -type f | head -20
@@ -383,44 +383,44 @@ main() {
         print_info "Total files: $(find "$LOCAL_BUILD_DIR" -type f | wc -l)"
         exit 0
     fi
-    
+
     # Confirm deployment
     read -p "Deploy to Hostinger? (y/n): " confirm
     if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
         print_error "Deployment cancelled"
         exit 0
     fi
-    
+
     # Execute deployment
     if [[ "$do_backup" == true ]]; then
         create_backup
     fi
-    
+
     deploy_via_sftp
     set_permissions
     verify_deployment
-    
+
     # Success message
     echo -e "\n${GREEN}════════════════════════════════════════════════════${NC}"
     echo -e "${GREEN}  ✓ Deployment Complete!${NC}"
     echo -e "${GREEN}════════════════════════════════════════════════════${NC}\n"
-    
+
     print_success "Files deployed to $REMOTE_DIR"
     print_info "Your site should be live at your domain"
-    
+
     if [[ "$do_backup" == true ]]; then
         print_info "Backup saved in: backups/"
     fi
-    
+
     echo -e "\n${BLUE}Next Steps:${NC}"
     echo "  • Visit your domain to verify deployment"
     echo "  • Check browser console for any errors"
     echo "  • Clear CDN cache if using Cloudflare"
-    
+
     if [[ "$PROJECT_TYPE" == "nextjs" || "$PROJECT_TYPE" == "react" ]]; then
         echo -e "\n${YELLOW}Note:${NC} For Next.js/React apps, ensure your build completed successfully"
     fi
-    
+
     echo ""
 }
 
