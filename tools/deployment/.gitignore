@@ -1,0 +1,12 @@
+# Never commit credentials
+.hostinger-config
+
+# Backups
+backups/
+
+# OS files
+.DS_Store
+
+# Temporary files
+*.tmp
+*.log

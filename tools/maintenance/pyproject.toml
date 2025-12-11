@@ -1,0 +1,16 @@
+[tool.black]
+line-length = 120
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.autopep8]
+max_line_length = 120
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.messages_control]
+disable = ["C0301"]

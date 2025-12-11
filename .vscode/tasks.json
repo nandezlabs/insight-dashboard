@@ -5,6 +5,23 @@
   // =====================================================================
   "version": "2.0.0",
   "tasks": [
+    // === STARTUP TASKS ===
+    {
+      "label": "🤖 Copilot: Daily Permission Check",
+      "type": "shell",
+      "command": "bash ${workspaceFolder}/tools/workflow/copilot-check-once.sh",
+      "presentation": {
+        "reveal": "never",
+        "panel": "shared",
+        "showReuseMessage": false,
+        "close": true
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": []
+    },
+
     // === PYTHON TASKS ===
     {
       "label": "Python: Create Virtual Environment",
@@ -196,6 +213,48 @@
       "presentation": {
         "reveal": "always",
         "panel": "new"
+      },
+      "problemMatcher": []
+    },
+
+    // === COPILOT PERMISSIONS ===
+    {
+      "label": "🤖 Copilot: Change Permissions",
+      "type": "shell",
+      "command": "bash ${workspaceFolder}/tools/workflow/copilot-permissions.sh",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Copilot: Daily Reset & Prompt",
+      "type": "shell",
+      "command": "bash ${workspaceFolder}/tools/workflow/copilot-daily-reset.sh",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Copilot: Set Always",
+      "type": "shell",
+      "command": "bash ${workspaceFolder}/tools/workflow/copilot-permissions.sh always",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Copilot: Set Once Per Workspace",
+      "type": "shell",
+      "command": "bash ${workspaceFolder}/tools/workflow/copilot-permissions.sh oncePerWorkspace",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
       },
       "problemMatcher": []
     }
