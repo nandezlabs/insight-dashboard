@@ -1,0 +1,252 @@
+// =====================================================================
+// Custom Keybindings for Developer Workspace
+// macOS-optimized shortcuts for your workflow
+// =====================================================================
+//
+// Legend:
+// cmd = Command (⌘)
+// shift = Shift (⇧)
+// alt/option = Option (⌥)
+// ctrl = Control (⌃)
+//
+// Conflicts avoided with VS Code defaults
+// =====================================================================
+
+[
+  // === QUICK TASKS (Cmd+K prefix for custom commands) ===
+  {
+    "key": "cmd+k cmd+n",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🚀 Quick: New Project",
+    "when": "!inDebugMode"
+  },
+  {
+    "key": "cmd+k cmd+s",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📊 Quick: Code Stats",
+    "when": "!inDebugMode"
+  },
+  {
+    "key": "cmd+k cmd+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "💾 Quick: Backup Config",
+    "when": "!inDebugMode"
+  },
+  {
+    "key": "cmd+k cmd+c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🧹 Quick: Clean All Caches",
+    "when": "!inDebugMode"
+  },
+  {
+    "key": "cmd+k cmd+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔍 Quick: Search TODO Comments",
+    "when": "!inDebugMode"
+  },
+
+  // === TERMINAL SHORTCUTS ===
+  {
+    "key": "ctrl+shift+t",
+    "command": "workbench.action.terminal.new",
+    "when": "!terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+k",
+    "command": "workbench.action.terminal.kill",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+c",
+    "command": "workbench.action.terminal.clear",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "cmd+j",
+    "command": "workbench.action.terminal.toggleTerminal"
+  },
+
+  // === PYTHON WORKFLOW ===
+  {
+    "key": "cmd+shift+r",
+    "command": "python.execInTerminal",
+    "when": "editorLangId == python"
+  },
+  {
+    "key": "cmd+k cmd+v",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Python: Create Virtual Environment",
+    "when": "!inDebugMode"
+  },
+  {
+    "key": "cmd+k cmd+i",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Python: Install Requirements",
+    "when": "!inDebugMode"
+  },
+
+  // === GODOT WORKFLOW ===
+  {
+    "key": "cmd+shift+g",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Godot: Open Project in Editor",
+    "when": "resourceExtname == .gd || resourceExtname == .tscn"
+  },
+  {
+    "key": "cmd+shift+f5",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Godot: Run Game",
+    "when": "resourceExtname == .gd || resourceExtname == .tscn"
+  },
+
+  // === NPM/NODE WORKFLOW ===
+  {
+    "key": "cmd+k cmd+d",
+    "command": "workbench.action.tasks.runTask",
+    "args": "NPM: Dev Server",
+    "when": "!inDebugMode"
+  },
+
+  // === FILE NAVIGATION ===
+  {
+    "key": "cmd+shift+o",
+    "command": "workbench.action.quickOpen",
+    "args": "edt "
+  },
+  {
+    "key": "alt+cmd+left",
+    "command": "workbench.action.previousEditor"
+  },
+  {
+    "key": "alt+cmd+right",
+    "command": "workbench.action.nextEditor"
+  },
+
+  // === GIT SHORTCUTS ===
+  {
+    "key": "cmd+k cmd+g",
+    "command": "workbench.view.scm",
+    "when": "!inDebugMode"
+  },
+  {
+    "key": "cmd+k cmd+p",
+    "command": "git.push",
+    "when": "!inDebugMode"
+  },
+  {
+    "key": "cmd+k cmd+l",
+    "command": "git.pull",
+    "when": "!inDebugMode"
+  },
+
+  // === SIDEBAR TOGGLES ===
+  {
+    "key": "cmd+1",
+    "command": "workbench.view.explorer"
+  },
+  {
+    "key": "cmd+2",
+    "command": "workbench.view.search"
+  },
+  {
+    "key": "cmd+3",
+    "command": "workbench.view.scm"
+  },
+  {
+    "key": "cmd+4",
+    "command": "workbench.view.debug"
+  },
+  {
+    "key": "cmd+5",
+    "command": "workbench.view.extensions"
+  },
+
+  // === COPILOT SHORTCUTS ===
+  {
+    "key": "alt+\\",
+    "command": "github.copilot.generate",
+    "when": "editorTextFocus && !inDebugMode"
+  },
+  {
+    "key": "alt+[",
+    "command": "editor.action.inlineSuggest.showPrevious",
+    "when": "inlineSuggestionVisible && !editorReadonly"
+  },
+  {
+    "key": "alt+]",
+    "command": "editor.action.inlineSuggest.showNext",
+    "when": "inlineSuggestionVisible && !editorReadonly"
+  },
+
+  // === EDITOR ENHANCEMENTS ===
+  {
+    "key": "cmd+k cmd+f",
+    "command": "editor.action.formatDocument",
+    "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "cmd+shift+l",
+    "command": "editor.action.selectHighlights",
+    "when": "editorFocus"
+  },
+  {
+    "key": "alt+up",
+    "command": "editor.action.moveLinesUpAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "alt+down",
+    "command": "editor.action.moveLinesDownAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "cmd+d",
+    "command": "editor.action.addSelectionToNextFindMatch",
+    "when": "editorFocus"
+  },
+
+  // === WORKSPACE NAVIGATION ===
+  {
+    "key": "cmd+k cmd+w",
+    "command": "workbench.action.files.openFolder"
+  },
+  {
+    "key": "cmd+0",
+    "command": "workbench.action.focusSideBar"
+  },
+
+  // === PRODUCTIVITY ===
+  {
+    "key": "cmd+k cmd+r",
+    "command": "workbench.action.reloadWindow"
+  },
+  {
+    "key": "cmd+k cmd+x",
+    "command": "workbench.action.closeAllEditors"
+  },
+  {
+    "key": "cmd+k cmd+z",
+    "command": "workbench.action.toggleZenMode"
+  },
+
+  // === SPLIT EDITOR ===
+  {
+    "key": "cmd+\\",
+    "command": "workbench.action.splitEditor"
+  },
+  {
+    "key": "cmd+k left",
+    "command": "workbench.action.focusLeftGroup"
+  },
+  {
+    "key": "cmd+k right",
+    "command": "workbench.action.focusRightGroup"
+  },
+
+  // === TODO TREE (if extension installed) ===
+  {
+    "key": "cmd+shift+t",
+    "command": "todo-tree-view.focus",
+    "when": "!terminalFocus"
+  }
+]

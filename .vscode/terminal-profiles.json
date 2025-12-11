@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "presentation": {
+    "echo": true,
+    "reveal": "always",
+    "focus": false,
+    "panel": "shared",
+    "showReuseMessage": true,
+    "clear": false
+  },
+  "profiles": {
+    "Developer": {
+      "path": "/bin/zsh",
+      "icon": "terminal",
+      "color": "terminal.ansiGreen",
+      "env": {
+        "DEV_WORKSPACE": "${workspaceFolder}"
+      }
+    },
+    "Python Env": {
+      "path": "/bin/zsh",
+      "args": ["-c", "source .venv/bin/activate 2>/dev/null && exec zsh"],
+      "icon": "symbol-method",
+      "color": "terminal.ansiYellow"
+    },
+    "Tools": {
+      "path": "/bin/zsh",
+      "args": ["-c", "cd ${workspaceFolder}/tools && exec zsh"],
+      "icon": "tools",
+      "color": "terminal.ansiCyan"
+    },
+    "Projects": {
+      "path": "/bin/zsh",
+      "args": ["-c", "cd ${workspaceFolder}/projects && exec zsh"],
+      "icon": "folder-library",
+      "color": "terminal.ansiBlue"
+    }
+  }
+}

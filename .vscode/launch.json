@@ -1,0 +1,145 @@
+{
+  // =====================================================================
+  // VS Code Launch Configurations for Developer Workspace
+  // Debugging configurations for different project types
+  // =====================================================================
+  "version": "0.2.0",
+  "configurations": [
+    // === PYTHON DEBUGGING ===
+    {
+      "name": "Python: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Module",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "${input:moduleName}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Django",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["runserver"],
+      "django": true,
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Flask",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "FLASK_APP": "app.py",
+        "FLASK_DEBUG": "1"
+      },
+      "args": ["run", "--no-debugger"],
+      "jinja": true,
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Pytest",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-v", "${file}"],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+
+    // === NODE/JAVASCRIPT DEBUGGING ===
+    {
+      "name": "Node: Launch Program",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/index.js",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Node: Current File",
+      "type": "node",
+      "request": "launch",
+      "program": "${file}",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Node: Attach to Process",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**"]
+    },
+
+    // === CHROME DEBUGGING (Web Apps) ===
+    {
+      "name": "Chrome: Launch",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true
+    },
+    {
+      "name": "Chrome: Launch with Live Server",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5500",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true
+    },
+
+    // === GODOT DEBUGGING ===
+    {
+      "name": "Godot: Launch",
+      "type": "godot",
+      "request": "launch",
+      "project": "${workspaceFolder}",
+      "port": 6007,
+      "address": "127.0.0.1",
+      "launch_game_instance": true,
+      "launch_scene": false
+    },
+    {
+      "name": "Godot: Launch Scene",
+      "type": "godot",
+      "request": "launch",
+      "project": "${workspaceFolder}",
+      "port": 6007,
+      "address": "127.0.0.1",
+      "launch_game_instance": true,
+      "launch_scene": true
+    },
+
+    // === BASH DEBUGGING ===
+    {
+      "name": "Bash: Debug Script",
+      "type": "bashdb",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "internalConsoleOptions": "openOnSessionStart",
+      "presentation": {
+        "hidden": false,
+        "group": "",
+        "order": 1
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "moduleName",
+      "type": "promptString",
+      "description": "Enter the module name to debug",
+      "default": "main"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  // =====================================================================
+  // Recommended Extensions for Developer Workspace
+  // These extensions support the multi-language development workflow
+  // =====================================================================
+  "recommendations": [
+    // === ESSENTIAL ===
+    "github.copilot",
+    "github.copilot-chat",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "pkief.material-icon-theme",
+    "usernamehw.errorlens",
+    "christian-kohler.path-intellisense",
+
+    // === PYTHON ===
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.black-formatter",
+    "ms-python.isort",
+    "ms-python.debugpy",
+
+    // === WEB DEVELOPMENT ===
+    "dsznajder.es7-react-js-snippets",
+    "bradlc.vscode-tailwindcss",
+    "formulahendry.auto-rename-tag",
+    "formulahendry.auto-close-tag",
+    "ritwickdey.liveserver",
+    "rangav.vscode-thunder-client",
+
+    // === GODOT GAME DEVELOPMENT ===
+    "geequlim.godot-tools",
+
+    // === DATABASE ===
+    "qwtel.sqlite-viewer",
+
+    // === PRODUCTIVITY ===
+    "gruntfuggly.todo-tree",
+    "aaron-bond.better-comments",
+    "streetsidesoftware.code-spell-checker",
+    "alefragnani.project-manager",
+
+    // === MARKDOWN ===
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint"
+  ],
+  "unwantedRecommendations": []
+}

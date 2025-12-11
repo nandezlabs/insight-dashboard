@@ -1,0 +1,35 @@
+# =====================================================================
+# Git Commit Message Template
+# Use: git config commit.template .gitmessage
+# =====================================================================
+
+# <type>(<scope>): <subject>
+#
+# Types:
+#   feat:     New feature
+#   fix:      Bug fix
+#   docs:     Documentation changes
+#   style:    Code style changes (formatting, etc)
+#   refactor: Code refactoring
+#   perf:     Performance improvements
+#   test:     Adding or updating tests
+#   chore:    Maintenance tasks
+#   build:    Build system changes
+#   ci:       CI/CD changes
+#   revert:   Revert previous commit
+#
+# Example: feat(godot): add player movement mechanics
+# Example: fix(web): resolve login authentication issue
+# Example: docs(readme): update installation instructions
+#
+# =====================================================================
+# Body (optional): Explain what and why vs. how
+# - Use bullet points for multiple changes
+# - Reference issues: Fixes #123, Closes #456
+# - Break lines at 72 characters
+#
+# =====================================================================
+# Footer (optional):
+# - Breaking changes: BREAKING CHANGE: description
+# - Issue references: Fixes #123
+# - Co-authors: Co-authored-by: name <email>

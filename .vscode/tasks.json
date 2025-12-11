@@ -1,0 +1,203 @@
+{
+  // =====================================================================
+  // VS Code Tasks for Developer Workspace
+  // Common development operations across different project types
+  // =====================================================================
+  "version": "2.0.0",
+  "tasks": [
+    // === PYTHON TASKS ===
+    {
+      "label": "Python: Create Virtual Environment",
+      "type": "shell",
+      "command": "python3 -m venv .venv && echo '✓ Virtual environment created at .venv'",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: Install Requirements",
+      "type": "shell",
+      "command": "source .venv/bin/activate && pip install -r requirements.txt",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: Run Tests",
+      "type": "shell",
+      "command": "source .venv/bin/activate && pytest",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: Format with Black",
+      "type": "shell",
+      "command": "source .venv/bin/activate && black .",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": []
+    },
+
+    // === NODE/NPM TASKS ===
+    {
+      "label": "NPM: Install Dependencies",
+      "type": "shell",
+      "command": "npm install",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "NPM: Dev Server",
+      "type": "shell",
+      "command": "npm run dev",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^\\s*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "."
+        }
+      }
+    },
+    {
+      "label": "NPM: Build",
+      "type": "shell",
+      "command": "npm run build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+
+    // === GODOT TASKS ===
+    {
+      "label": "Godot: Open Project in Editor",
+      "type": "shell",
+      "command": "open -a Godot ${workspaceFolder}",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Godot: Run Game",
+      "type": "shell",
+      "command": "/Applications/Godot.app/Contents/MacOS/Godot --path ${workspaceFolder}",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+
+    // === GIT TASKS ===
+    {
+      "label": "Git: Status",
+      "type": "shell",
+      "command": "git status",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Git: Pull",
+      "type": "shell",
+      "command": "git pull",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+
+    // === PROJECT MANAGEMENT ===
+    {
+      "label": "Tools: Create New Project",
+      "type": "shell",
+      "command": "bash ${workspaceFolder}/tools/project-management/create-project.sh",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tools: Backup Configuration",
+      "type": "shell",
+      "command": "bash ${workspaceFolder}/tools/backup/config-backup.sh",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+
+    // === WORKSPACE MAINTENANCE ===
+    {
+      "label": "Clean: Remove Python Cache",
+      "type": "shell",
+      "command": "find ${workspaceFolder} -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true && echo '✓ Python cache cleaned'",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Clean: Remove Node Modules",
+      "type": "shell",
+      "command": "find ${workspaceFolder} -name 'node_modules' -type d -prune -exec rm -rf '{}' + && echo '✓ node_modules cleaned'",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stats: Code Statistics",
+      "type": "shell",
+      "command": "bash ${workspaceFolder}/tools/analytics/loc-tracker.sh",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+
+    // === TERMINAL COMMANDS ===
+    {
+      "label": "Terminal: Quick Commands",
+      "type": "shell",
+      "command": "echo 'Select a command:' && PS3='Choose: ' && select cmd in 'New Project' 'Code Stats' 'Clean Caches' 'Backup Config' 'Git Status'; do case $cmd in 'New Project') bash tools/project-management/create-project.sh;; 'Code Stats') bash tools/analytics/loc-tracker.sh;; 'Clean Caches') find . -type d \\( -name '__pycache__' -o -name 'node_modules' -o -name '.godot' \\) -prune -exec rm -rf '{}' + 2>/dev/null;; 'Backup Config') bash tools/backup/config-backup.sh;; 'Git Status') git status;; esac; break; done",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

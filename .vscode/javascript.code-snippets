@@ -1,0 +1,113 @@
+{
+  // =====================================================================
+  // JavaScript/TypeScript Code Snippets for Developer Workspace
+  // =====================================================================
+
+  "React Functional Component": {
+    "prefix": "rfc",
+    "body": [
+      "import React from 'react';",
+      "",
+      "export const ${1:ComponentName} = () => {",
+      "  return (",
+      "    <div>",
+      "      ${2:content}",
+      "    </div>",
+      "  );",
+      "};",
+      ""
+    ],
+    "description": "React functional component"
+  },
+
+  "React Component with useState": {
+    "prefix": "rfcs",
+    "body": [
+      "import React, { useState } from 'react';",
+      "",
+      "export const ${1:ComponentName} = () => {",
+      "  const [${2:state}, set${2/(.*)/${1:/capitalize}/}] = useState(${3:initialValue});",
+      "",
+      "  return (",
+      "    <div>",
+      "      ${4:content}",
+      "    </div>",
+      "  );",
+      "};",
+      ""
+    ],
+    "description": "React component with useState hook"
+  },
+
+  "React useEffect": {
+    "prefix": "useeff",
+    "body": [
+      "useEffect(() => {",
+      "  ${1:// effect}",
+      "  ",
+      "  return () => {",
+      "    ${2:// cleanup}",
+      "  };",
+      "}, [${3:dependencies}]);"
+    ],
+    "description": "React useEffect hook"
+  },
+
+  "TypeScript Interface": {
+    "prefix": "tsint",
+    "body": [
+      "interface ${1:InterfaceName} {",
+      "  ${2:property}: ${3:type};",
+      "}"
+    ],
+    "description": "TypeScript interface"
+  },
+
+  "TypeScript Type": {
+    "prefix": "tstype",
+    "body": ["type ${1:TypeName} = {", "  ${2:property}: ${3:type};", "};"],
+    "description": "TypeScript type"
+  },
+
+  "Console Log": {
+    "prefix": "cl",
+    "body": ["console.log('${1:message}:', ${2:variable});"],
+    "description": "Console log"
+  },
+
+  "Arrow Function": {
+    "prefix": "af",
+    "body": [
+      "const ${1:functionName} = (${2:params}) => {",
+      "  ${3:// body}",
+      "};"
+    ],
+    "description": "Arrow function"
+  },
+
+  "Async Function": {
+    "prefix": "asyncf",
+    "body": [
+      "async function ${1:functionName}(${2:params}) {",
+      "  try {",
+      "    ${3:// body}",
+      "  } catch (error) {",
+      "    console.error('Error in ${1}:', error);",
+      "  }",
+      "}"
+    ],
+    "description": "Async function with try-catch"
+  },
+
+  "Import Statement": {
+    "prefix": "imp",
+    "body": ["import { ${1:module} } from '${2:package}';"],
+    "description": "ES6 import statement"
+  },
+
+  "Export Named": {
+    "prefix": "expn",
+    "body": ["export { ${1:name} };"],
+    "description": "Named export"
+  }
+}

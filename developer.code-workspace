@@ -1,0 +1,237 @@
+{
+  "folders": [
+    {
+      "name": "🏠 Developer (Root)",
+      "path": "."
+    },
+    {
+      "name": "📦 Projects",
+      "path": "projects"
+    },
+    {
+      "name": "🔧 Tools",
+      "path": "tools"
+    },
+    {
+      "name": "🎮 Games",
+      "path": "games"
+    },
+    {
+      "name": "📄 Docs",
+      "path": "docs"
+    },
+    {
+      "name": "📋 Templates",
+      "path": "templates"
+    },
+    {
+      "name": "💡 Insight (Web App)",
+      "path": "projects/insight"
+    },
+    {
+      "name": "🐍 D280 Python",
+      "path": "projects/d280-python"
+    },
+    {
+      "name": "📓 Python Notebooks",
+      "path": "projects/python-notebooks"
+    },
+    {
+      "name": "🕹️ My Games",
+      "path": "games/my-games"
+    }
+  ],
+  "settings": {
+    // =====================================================================
+    // Multi-Root Workspace Settings
+    // These settings apply across all folders in this workspace
+    // =====================================================================
+
+    // === WORKSPACE BEHAVIOR ===
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.closeOnFileDelete": true,
+    "workbench.startupEditor": "none",
+    "workbench.tree.indent": 20,
+
+    // === SEARCH CONFIGURATION ===
+    "search.useGlobalIgnoreFiles": true,
+    "search.smartCase": true,
+    "search.followSymlinks": false,
+
+    // === FILE MANAGEMENT ===
+    "files.autoSave": "onFocusChange",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+
+    // === EDITOR SETTINGS ===
+    "editor.formatOnSave": true,
+    "editor.minimap.enabled": false,
+    "editor.suggest.preview": true,
+    "editor.inlineSuggest.enabled": true,
+    "editor.stickyScroll.enabled": true,
+
+    // === TERMINAL ===
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.cwd": "${fileDirname}",
+    "terminal.integrated.scrollback": 10000,
+
+    // === GIT ===
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    "scm.defaultViewMode": "tree",
+
+    // === EXCLUDE PATTERNS (Performance) ===
+    "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/**": true,
+      "**/.godot/**": true,
+      "**/__pycache__/**": true,
+      "**/.venv/**": true,
+      "**/builds/**": true,
+      "**/dist/**": true,
+      "**/.DS_Store": true
+    },
+
+    // === BREADCRUMBS ===
+    "breadcrumbs.enabled": true,
+    "breadcrumbs.symbolPath": "on",
+
+    // === EXPLORER ===
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    "explorer.sortOrder": "type",
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+      "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.test.ts",
+      "*.tsx": "${capture}.js, ${capture}.test.tsx",
+      "*.py": "${capture}.pyc, __pycache__",
+      "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, .npmrc, .yarnrc",
+      "pyproject.toml": "poetry.lock, requirements.txt, setup.py, setup.cfg, MANIFEST.in",
+      ".gitignore": ".gitattributes, .gitmodules, .gitmessage"
+    },
+
+    // === COPILOT ===
+    "github.copilot.enable": {
+      "*": true,
+      "yaml": false,
+      "plaintext": false,
+      "markdown": false
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      // === ESSENTIAL ===
+      "github.copilot",
+      "github.copilot-chat",
+      "eamodio.gitlens",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "pkief.material-icon-theme",
+      "usernamehw.errorlens",
+
+      // === PYTHON ===
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "ms-python.black-formatter",
+
+      // === WEB DEVELOPMENT ===
+      "dsznajder.es7-react-js-snippets",
+      "bradlc.vscode-tailwindcss",
+      "rangav.vscode-thunder-client",
+
+      // === GODOT ===
+      "geequlim.godot-tools",
+
+      // === PRODUCTIVITY ===
+      "gruntfuggly.todo-tree",
+      "aaron-bond.better-comments",
+      "streetsidesoftware.code-spell-checker",
+      "alefragnani.project-manager"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Python: Current File",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${file}",
+        "console": "integratedTerminal",
+        "justMyCode": true
+      },
+      {
+        "name": "Node: Current File",
+        "type": "node",
+        "request": "launch",
+        "program": "${file}",
+        "skipFiles": ["<node_internals>/**"]
+      },
+      {
+        "name": "Chrome: Launch Web App",
+        "type": "chrome",
+        "request": "launch",
+        "url": "http://localhost:3000",
+        "webRoot": "${workspaceFolder}",
+        "sourceMaps": true
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "🚀 Quick: New Project",
+        "type": "shell",
+        "command": "bash ${workspaceFolder}/tools/project-management/create-project.sh",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "📊 Quick: Code Stats",
+        "type": "shell",
+        "command": "bash ${workspaceFolder}/tools/analytics/loc-tracker.sh",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "💾 Quick: Backup Config",
+        "type": "shell",
+        "command": "bash ${workspaceFolder}/tools/backup/config-backup.sh",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "🧹 Quick: Clean All Caches",
+        "type": "shell",
+        "command": "find ${workspaceFolder} -type d \\( -name '__pycache__' -o -name 'node_modules' -o -name '.godot' -o -name 'dist' \\) -prune -exec rm -rf '{}' + 2>/dev/null || true && echo '✓ All caches cleaned'",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "🔍 Quick: Search TODO Comments",
+        "type": "shell",
+        "command": "grep -r 'TODO\\|FIXME\\|HACK\\|XXX' --include='*.py' --include='*.js' --include='*.ts' --include='*.gd' ${workspaceFolder} | head -50",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+}

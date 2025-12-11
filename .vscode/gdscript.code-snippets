@@ -1,0 +1,122 @@
+{
+  // =====================================================================
+  // GDScript Code Snippets for Godot Game Development
+  // =====================================================================
+
+  "Godot Node Ready": {
+    "prefix": "ready",
+    "body": ["func _ready():", "\t${1:pass}"],
+    "description": "Godot _ready function"
+  },
+
+  "Godot Process": {
+    "prefix": "process",
+    "body": ["func _process(delta):", "\t${1:pass}"],
+    "description": "Godot _process function"
+  },
+
+  "Godot Physics Process": {
+    "prefix": "physics",
+    "body": ["func _physics_process(delta):", "\t${1:pass}"],
+    "description": "Godot _physics_process function"
+  },
+
+  "Godot Input": {
+    "prefix": "input",
+    "body": [
+      "func _input(event):",
+      "\tif event is InputEventKey:",
+      "\t\tif event.pressed:",
+      "\t\t\t${1:pass}"
+    ],
+    "description": "Godot _input function"
+  },
+
+  "Godot Signal": {
+    "prefix": "signal",
+    "body": ["signal ${1:signal_name}(${2:params})"],
+    "description": "Godot signal declaration"
+  },
+
+  "Godot Export Variable": {
+    "prefix": "export",
+    "body": ["@export var ${1:variable_name}: ${2:type} = ${3:default}"],
+    "description": "Godot exported variable"
+  },
+
+  "Godot Onready Variable": {
+    "prefix": "onready",
+    "body": ["@onready var ${1:node_name} = $${2:NodePath}"],
+    "description": "Godot onready variable"
+  },
+
+  "Godot Class": {
+    "prefix": "class",
+    "body": [
+      "class_name ${1:ClassName}",
+      "extends ${2:Node}",
+      "",
+      "func _ready():",
+      "\t${3:pass}"
+    ],
+    "description": "Godot class with class_name"
+  },
+
+  "Godot Function": {
+    "prefix": "func",
+    "body": [
+      "func ${1:function_name}(${2:params})${3: -> ${4:return_type}}:",
+      "\t${5:pass}"
+    ],
+    "description": "Godot function"
+  },
+
+  "Godot Timer": {
+    "prefix": "timer",
+    "body": [
+      "var timer = Timer.new()",
+      "timer.wait_time = ${1:1.0}",
+      "timer.one_shot = ${2:true}",
+      "timer.timeout.connect(${3:_on_timeout})",
+      "add_child(timer)",
+      "timer.start()"
+    ],
+    "description": "Godot timer setup"
+  },
+
+  "Godot Animation": {
+    "prefix": "anim",
+    "body": [
+      "@onready var anim = $AnimationPlayer",
+      "",
+      "func play_animation(anim_name: String):",
+      "\tif anim.has_animation(anim_name):",
+      "\t\tanim.play(anim_name)"
+    ],
+    "description": "Godot animation player setup"
+  },
+
+  "Godot Vector2 Movement": {
+    "prefix": "move2d",
+    "body": [
+      "var velocity = Vector2.ZERO",
+      "var speed = ${1:200.0}",
+      "",
+      "func _physics_process(delta):",
+      "\tvelocity = Vector2.ZERO",
+      "\t",
+      "\tif Input.is_action_pressed(\"ui_right\"):",
+      "\t\tvelocity.x += 1",
+      "\tif Input.is_action_pressed(\"ui_left\"):",
+      "\t\tvelocity.x -= 1",
+      "\tif Input.is_action_pressed(\"ui_down\"):",
+      "\t\tvelocity.y += 1",
+      "\tif Input.is_action_pressed(\"ui_up\"):",
+      "\t\tvelocity.y -= 1",
+      "\t",
+      "\tvelocity = velocity.normalized() * speed",
+      "\tmove_and_slide(velocity)"
+    ],
+    "description": "Basic 2D movement with input"
+  }
+}

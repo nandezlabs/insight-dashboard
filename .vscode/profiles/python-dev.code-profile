@@ -1,0 +1,41 @@
+{
+  "name": "🐍 Python & Data Science",
+  "settings": {
+    "workbench.colorTheme": "Default Dark Modern",
+    "editor.fontSize": 14,
+    "editor.minimap.enabled": false,
+    "editor.rulers": [
+      88,
+      120
+    ],
+    "python.analysis.typeCheckingMode": "basic",
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.testing.pytestEnabled": true,
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter",
+      "editor.formatOnSave": true,
+      "editor.tabSize": 4
+    },
+    "files.exclude": {
+      "**/.git": true,
+      "**/__pycache__": true,
+      "**/.pytest_cache": true,
+      "**/.venv": true,
+      "**/dist": true,
+      "**/build": true
+    },
+    "explorer.sortOrder": "type"
+  },
+  "extensions": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.black-formatter",
+    "ms-python.isort",
+    "ms-python.debugpy",
+    "github.copilot",
+    "eamodio.gitlens",
+    "ms-toolsai.jupyter",
+    "gruntfuggly.todo-tree"
+  ]
+}

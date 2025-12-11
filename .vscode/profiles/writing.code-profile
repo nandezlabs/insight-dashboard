@@ -1,0 +1,37 @@
+{
+  "name": "✍️ Writing & Documentation",
+  "settings": {
+    "workbench.colorTheme": "Default Light Modern",
+    "editor.fontSize": 15,
+    "editor.lineHeight": 1.8,
+    "editor.wordWrap": "on",
+    "editor.minimap.enabled": false,
+    "editor.lineNumbers": "off",
+    "editor.renderWhitespace": "none",
+    "editor.rulers": [],
+    "workbench.activityBar.visible": false,
+    "workbench.statusBar.visible": true,
+    "breadcrumbs.enabled": false,
+    "zenMode.centerLayout": true,
+    "zenMode.hideLineNumbers": true,
+    "files.exclude": {
+      "**/.git": true,
+      "**/node_modules": true
+    },
+    "[markdown]": {
+      "editor.formatOnSave": false,
+      "editor.wordWrap": "on",
+      "editor.quickSuggestions": {
+        "comments": "off",
+        "strings": "off",
+        "other": "off"
+      }
+    }
+  },
+  "extensions": [
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+    "streetsidesoftware.code-spell-checker",
+    "bierner.markdown-preview-github-styles"
+  ]
+}

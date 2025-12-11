@@ -1,0 +1,20 @@
+{
+  "name": "🎮 Game Development",
+  "settings": {
+    "workbench.colorTheme": "Default Dark Modern",
+    "editor.fontSize": 14,
+    "editor.minimap.enabled": false,
+    "files.exclude": {
+      "**/.git": true,
+      "**/node_modules": true,
+      "**/__pycache__": true
+    },
+    "explorer.sortOrder": "type"
+  },
+  "extensions": [
+    "geequlim.godot-tools",
+    "github.copilot",
+    "eamodio.gitlens",
+    "gruntfuggly.todo-tree"
+  ]
+}
