@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 SETTINGS_FILE="$HOME/Library/Application Support/Code/User/settings.json"
-BACKUP_FILE="$HOME/Library/Application Support/Code/User/settings.json.backup.$(date +%Y%m%d_%H%M%S)"
+# Backup removed - settings managed by git
 
 print_header() {
     echo -e "\n${BLUE}═══════════════════════════════════════════════════════════${NC}"
@@ -67,7 +67,7 @@ backup_settings() {
 
 merge_settings() {
     print_info "Merging recommended settings with your existing settings..."
-    
+
     # This would require jq for proper JSON merging
     # For now, we'll provide manual instructions
     print_info "Please manually merge the recommended settings from:"
@@ -112,7 +112,7 @@ EOF
 
 main() {
     print_header
-    
+
     case "${1:-}" in
         --apply)
             backup_settings

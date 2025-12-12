@@ -1,6 +1,9 @@
 #!/bin/bash
 
 ################################################################################
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 # React + Vite Project Creator
 # Creates modern React applications with Vite, TypeScript, and Tailwind CSS
 ################################################################################

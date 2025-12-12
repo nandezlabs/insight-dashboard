@@ -1,6 +1,9 @@
 #!/bin/bash
 # Sync All Repositories - Pull and push all projects
 # Usage: ./sync-repos.sh
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 
 set -e
 

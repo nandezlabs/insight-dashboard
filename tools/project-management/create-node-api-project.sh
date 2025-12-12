@@ -1,6 +1,9 @@
 #!/bin/bash
 
 ################################################################################
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 # Node.js API Project Creator
 # Creates Node.js API projects with Express/Fastify, TypeScript, and Docker
 ################################################################################

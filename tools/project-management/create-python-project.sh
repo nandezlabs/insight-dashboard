@@ -1,6 +1,9 @@
 #!/bin/bash
 
 ################################################################################
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 # Python Project Creator
 # Creates a new Python project with proper structure and configuration
 ################################################################################

@@ -1,6 +1,9 @@
 #!/bin/bash
 # Backup All Repositories - Clone to external location
 # Usage: ./backup-repos.sh /path/to/backup
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 
 set -e
 

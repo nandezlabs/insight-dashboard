@@ -199,7 +199,7 @@ echo -e "${YELLOW}Step 4: Adding NAS configuration to ~/.zshrc...${NC}\n"
 ZSHRC="$HOME/.zshrc"
 
 # Backup .zshrc
-cp "$ZSHRC" "$ZSHRC.backup.$(date +%Y%m%d_%H%M%S)"
+# Backup removed - file is in version control
 
 # Check if NAS config already exists
 if grep -q "# NAS Configuration" "$ZSHRC" 2>/dev/null; then

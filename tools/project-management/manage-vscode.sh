@@ -1,6 +1,9 @@
 #!/bin/bash
 # VS Code Settings Backup & Restore Script
 # Backs up extensions, settings, keybindings, and snippets
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 
 set -e
 

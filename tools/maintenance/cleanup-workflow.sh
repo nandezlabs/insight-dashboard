@@ -1,5 +1,8 @@
 #!/bin/bash
 set -euo pipefail
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 
 # =============================================================================
 # Cleanup Workflow - Automated Developer Folder Maintenance
@@ -30,7 +33,7 @@ DRY_RUN=false
 VERBOSE=false
 SCHEDULED=false
 GENERATE_REPORT=false
-REPORT_DIR="${HOME}/Developer/reports/cleanup"
+REPORT_DIR="${HOME}${DEV_TOOLS_REPORTS}"
 
 # Statistics
 TOTAL_SPACE_FREED=0

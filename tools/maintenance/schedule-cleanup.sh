@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 # =============================================================================
 # Schedule Cleanup - Automated Cleanup Scheduling for macOS
 # =============================================================================
@@ -28,7 +31,7 @@ PLIST_NAME="com.developer.cleanup"
 PLIST_PATH="$HOME/Library/LaunchAgents/${PLIST_NAME}.plist"
 CLEANUP_SCRIPT="$HOME/Developer/tools/maintenance/cleanup-workflow.sh"
 LOG_DIR="$HOME/Developer/logs/cleanup"
-REPORT_DIR="$HOME/Developer/reports/cleanup"
+REPORT_DIR="${DEV_TOOLS_REPORTS}"
 
 # =============================================================================
 # Helper Functions

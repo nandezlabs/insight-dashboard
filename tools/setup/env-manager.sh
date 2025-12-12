@@ -51,9 +51,9 @@ print_warning() {
 
 init_templates() {
     print_info "Initializing environment templates..."
-    
+
     mkdir -p "$TEMPLATES_DIR"
-    
+
     # Next.js template
     cat > "$TEMPLATES_DIR/nextjs.env" << 'EOF'
 # Next.js Environment Template
@@ -170,12 +170,12 @@ EOF
 
 list_templates() {
     print_info "Available templates:\n"
-    
+
     if [[ ! -d "$TEMPLATES_DIR" ]]; then
         print_warning "No templates found. Run with --init to create templates."
         return
     fi
-    
+
     local index=1
     for template in "$TEMPLATES_DIR"/*.env; do
         if [[ -f "$template" ]]; then
@@ -194,7 +194,7 @@ list_templates() {
 
 detect_project_type() {
     local project_dir="$1"
-    
+
     if [[ -f "$project_dir/next.config.js" ]] || [[ -f "$project_dir/next.config.ts" ]]; then
         echo "nextjs"
     elif [[ -f "$project_dir/vite.config.ts" ]] && grep -q "react" "$project_dir/package.json" 2>/dev/null; then
@@ -216,15 +216,15 @@ create_env_from_template() {
     local project_dir="$1"
     local template_name="$2"
     local template_path="$TEMPLATES_DIR/$template_name.env"
-    
+
     if [[ ! -f "$template_path" ]]; then
         print_error "Template not found: $template_name"
         return 1
     fi
-    
+
     local env_file="$project_dir/.env"
     local example_file="$project_dir/.env.example"
-    
+
     # Create .env if it doesn't exist
     if [[ -f "$env_file" ]]; then
         print_warning ".env already exists in $project_dir"
@@ -234,15 +234,15 @@ create_env_from_template() {
             return 0
         fi
     fi
-    
+
     # Copy template to .env
     cp "$template_path" "$env_file"
     print_success "Created .env from $template_name template"
-    
+
     # Create .env.example (without sensitive values)
     sed 's/=.*/=/' "$template_path" > "$example_file"
     print_success "Created .env.example"
-    
+
     # Ensure .env is in .gitignore
     if [[ -f "$project_dir/.gitignore" ]]; then
         if ! grep -q "^\.env$" "$project_dir/.gitignore"; then
@@ -250,52 +250,52 @@ create_env_from_template() {
             print_success "Added .env to .gitignore"
         fi
     fi
-    
+
     print_info "Edit $env_file with your values"
 }
 
 validate_env_file() {
     local env_file="$1"
-    
+
     if [[ ! -f "$env_file" ]]; then
         print_error "File not found: $env_file"
         return 1
     fi
-    
+
     print_info "Validating $env_file...\n"
-    
+
     local warnings=0
     local line_num=0
-    
+
     while IFS= read -r line; do
         ((line_num++))
-        
+
         # Skip comments and empty lines
         [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
-        
+
         # Check format
         if [[ ! "$line" =~ ^[A-Z_][A-Z0-9_]*=.*$ ]]; then
             print_warning "Line $line_num: Invalid format: $line"
             ((warnings++))
             continue
         fi
-        
+
         # Extract key and value
         local key="${line%%=*}"
         local value="${line#*=}"
-        
+
         # Check for empty values
         if [[ -z "$value" ]]; then
             print_warning "Line $line_num: Empty value for $key"
             ((warnings++))
         fi
-        
+
         # Check for placeholder values
         if [[ "$value" == *"your-"* || "$value" == *"change-"* || "$value" == *"generate-"* ]]; then
             print_warning "Line $line_num: Placeholder value for $key"
             ((warnings++))
         fi
-        
+
         # Check for common issues
         case $key in
             *SECRET*|*PASSWORD*|*KEY*)
@@ -318,35 +318,35 @@ validate_env_file() {
                 ;;
         esac
     done < "$env_file"
-    
+
     echo ""
     if [[ $warnings -eq 0 ]]; then
         print_success "No issues found"
     else
         print_warning "Found $warnings warnings"
     fi
-    
+
     return 0
 }
 
 compare_env_files() {
     local file1="$1"
     local file2="$2"
-    
+
     if [[ ! -f "$file1" ]] || [[ ! -f "$file2" ]]; then
         print_error "One or both files not found"
         return 1
     fi
-    
+
     print_info "Comparing files:\n"
     echo "  File 1: $file1"
     echo "  File 2: $file2"
     echo ""
-    
+
     # Extract keys from both files
     local keys1=$(grep -v "^#" "$file1" | grep "=" | cut -d'=' -f1 | sort)
     local keys2=$(grep -v "^#" "$file2" | grep "=" | cut -d'=' -f1 | sort)
-    
+
     # Keys in file1 but not in file2
     local missing_in_2=$(comm -23 <(echo "$keys1") <(echo "$keys2"))
     if [[ -n "$missing_in_2" ]]; then
@@ -356,7 +356,7 @@ compare_env_files() {
         done
         echo ""
     fi
-    
+
     # Keys in file2 but not in file1
     local missing_in_1=$(comm -13 <(echo "$keys1") <(echo "$keys2"))
     if [[ -n "$missing_in_1" ]]; then
@@ -366,7 +366,7 @@ compare_env_files() {
         done
         echo ""
     fi
-    
+
     # Common keys
     local common=$(comm -12 <(echo "$keys1") <(echo "$keys2"))
     if [[ -n "$common" ]]; then
@@ -377,35 +377,34 @@ compare_env_files() {
 sync_env_keys() {
     local source_file="$1"
     local target_file="$2"
-    
+
     if [[ ! -f "$source_file" ]]; then
         print_error "Source file not found: $source_file"
         return 1
     fi
-    
+
     if [[ ! -f "$target_file" ]]; then
         print_error "Target file not found: $target_file"
         return 1
     fi
-    
+
     print_info "Syncing keys from $source_file to $target_file..."
-    
+
     # Backup target file
-    cp "$target_file" "$target_file.backup"
-    print_info "Backup created: $target_file.backup"
-    
+    # Backup removed - file is in git
+
     # Extract keys from source that are missing in target
     while IFS= read -r line; do
         [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
-        
+
         local key="${line%%=*}"
-        
+
         if ! grep -q "^$key=" "$target_file"; then
             echo "$line" >> "$target_file"
             print_success "Added: $key"
         fi
     done < "$source_file"
-    
+
     print_success "Sync complete"
 }
 
@@ -415,17 +414,17 @@ sync_env_keys() {
 
 scan_all_projects() {
     print_info "Scanning all projects for environment files...\n"
-    
+
     local total=0
     local with_env=0
     local without_env=0
-    
+
     while IFS= read -r project_dir; do
         [[ ! -d "$project_dir" ]] && continue
-        
+
         local project_name=$(basename "$project_dir")
         ((total++))
-        
+
         if [[ -f "$project_dir/.env" ]]; then
             ((with_env++))
             local vars=$(grep -c "^[A-Z]" "$project_dir/.env" 2>/dev/null || echo 0)
@@ -435,7 +434,7 @@ scan_all_projects() {
             printf "${YELLOW}○${NC} %-30s ${RED}(no .env)${NC}\n" "$project_name"
         fi
     done < <(find "$PROJECTS_DIR" -maxdepth 2 -type f -name "package.json" -o -name "pyproject.toml" | xargs -I {} dirname {} | sort -u)
-    
+
     echo ""
     print_info "Summary: $total projects ($with_env with .env, $without_env without)"
 }

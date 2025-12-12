@@ -1,6 +1,9 @@
 #!/bin/bash
 
 ################################################################################
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 # iOS/Swift Project Creator
 # Creates iOS/macOS projects with Swift Package Manager and Xcode integration
 ################################################################################

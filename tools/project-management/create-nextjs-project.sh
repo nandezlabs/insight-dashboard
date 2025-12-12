@@ -1,6 +1,9 @@
 #!/bin/bash
 
 ################################################################################
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 # Next.js Project Creator
 # Creates Next.js 14+ projects with TypeScript, Tailwind CSS, and modern tooling
 ################################################################################

@@ -1,6 +1,9 @@
 #!/bin/bash
 # Automated New Project Setup Script
 # Creates a new project following nandezlabs conventions
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 
 set -e
 

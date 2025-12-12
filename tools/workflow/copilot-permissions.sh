@@ -6,7 +6,6 @@ set -euo pipefail
 # =====================================================================
 
 SETTINGS_FILE="${HOME}/Library/Application Support/Code/User/settings.json"
-BACKUP_FILE="${HOME}/Library/Application Support/Code/User/settings.json.backup"
 
 # Colors
 GREEN='\033[0;32m'
@@ -60,11 +59,6 @@ set_permission_mode() {
             return 1
             ;;
     esac
-
-    # Backup current settings
-    if ! cp "${SETTINGS_FILE}" "${BACKUP_FILE}" 2>/dev/null; then
-        echo "Warning: Could not create backup" >&2
-    fi
 
     # Update settings with error handling
     if python3 -c "

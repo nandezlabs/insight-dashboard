@@ -26,19 +26,19 @@
     },
     {
       "name": "💡 Insight (Web App)",
-      "path": "projects/insight"
+      "path": "projects/apps/insight"
     },
     {
       "name": "🐍 D280 Python",
-      "path": "projects/d280-python"
+      "path": "projects/learning/d280-python"
     },
     {
       "name": "📓 Python Notebooks",
-      "path": "projects/python-notebooks"
+      "path": "projects/learning/python-notebooks"
     },
     {
       "name": "🕹️ My Games",
-      "path": "games/my-games"
+      "path": "projects/games/my-games"
     }
   ],
   "settings": {

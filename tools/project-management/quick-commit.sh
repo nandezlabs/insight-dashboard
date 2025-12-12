@@ -1,6 +1,9 @@
 #!/bin/bash
 # Quick Commit - Auto-stage and commit with timestamp
 # Usage: ./quick-commit.sh [optional message]
+# Source path configuration
+source "${HOME}/Developer/tools/configs/developer-paths.conf" 2>/dev/null || true
+
 
 set -e
 
