@@ -1,0 +1,54 @@
+name: insight
+repository: https://github.com/yourusername/insight
+
+packages:
+  - apps/**
+  - packages/**
+
+command:
+  bootstrap:
+    runPubGetInParallel: true
+    usePubspecOverrides: true
+
+  version:
+    branch: main
+    message: "chore(release): publish packages"
+
+scripts:
+  analyze:
+    run: flutter analyze
+    description: Run static analysis on all packages
+
+  format:
+    run: dart format .
+    description: Format all Dart files
+
+  test:
+    run: flutter test
+    description: Run tests for all packages
+
+  clean:
+    run: flutter clean
+    description: Clean all packages
+
+  get:
+    run: flutter pub get
+    description: Get dependencies for all packages
+
+  build:ios:
+    run: flutter build ios --release
+    description: Build iOS apps
+    packageFilters:
+      dirExists: ios
+
+  build:android:
+    run: flutter build apk --release
+    description: Build Android apps
+    packageFilters:
+      dirExists: android
+
+  build:macos:
+    run: flutter build macos --release
+    description: Build macOS apps
+    packageFilters:
+      dirExists: macos
