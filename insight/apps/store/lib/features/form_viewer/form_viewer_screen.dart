@@ -156,20 +156,65 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
   }
 
   Future<void> _autoSave() async {
-    if (_isSaving) return;
+    if (_isSaving || _fields.isEmpty) return;
 
     setState(() => _isSaving = true);
 
     // Debounce auto-save
     await Future.delayed(const Duration(milliseconds: FormConstants.autoSaveDebounceMs));
 
-    // Simple mock auto-save - in production, save to local database
-    await Future.delayed(const Duration(milliseconds: 100));
+    try {
+      final repository = ref.read(submissionRepositoryProvider);
+      
+      // Check if we have an existing in-progress submission
+      final submissions = await repository.getFormSubmissions(widget.formId);
+      final inProgress = submissions.where((s) => s.status == SubmissionStatus.inProgress).toList();
+      
+      Submission submission;
+      if (inProgress.isNotEmpty) {
+        // Update existing
+        submission = inProgress.first.copyWith(updatedAt: DateTime.now());
+        await repository.updateSubmission(submission);
+      } else {
+        // Create new in-progress submission
+        submission = Submission(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          formId: widget.formId,
+          submittedBy: 'current_user_id', // TODO: Get from auth
+          submissionDate: DateTime.now(),
+          submissionTime: DateTime.now(),
+          status: SubmissionStatus.inProgress,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        await repository.createSubmission(submission);
+      }
+      
+      // Save/update answers
+      for (final field in _fields) {
+        final value = _answers[field.id];
+        if (value != null) {
+          final answer = SubmissionAnswer(
+            id: '${submission.id}_${field.id}',
+            submissionId: submission.id,
+            fieldId: field.id,
+            answerValue: _serializeValue(value),
+            answeredAt: DateTime.now(),
+          );
+          
+          // Use saveAnswer which handles create/update
+          await repository.saveAnswer(answer);
+        }
+      }
 
-    setState(() {
-      _isSaving = false;
-      _lastSaveTime = DateTime.now();
-    });
+      setState(() {
+        _isSaving = false;
+        _lastSaveTime = DateTime.now();
+      });
+    } catch (e) {
+      debugPrint('Auto-save error: $e');
+      setState(() => _isSaving = false);
+    }
   }
 
   int _getTotalFieldsCount() {
@@ -210,17 +255,54 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
     setState(() => _isSaving = true);
 
     try {
-      // Mock submission - in production, save to backend
-      await Future.delayed(const Duration(milliseconds: 500));
+      final repository = ref.read(submissionRepositoryProvider);
+      
+      // Create submission
+      final now = DateTime.now();
+      final submission = Submission(
+        id: now.millisecondsSinceEpoch.toString(),
+        formId: widget.formId,
+        submittedBy: 'current_user_id', // TODO: Get from auth
+        submissionDate: now,
+        submissionTime: now,
+        status: SubmissionStatus.completed,
+        completionPercentage: 100.0,
+        createdAt: now,
+        updatedAt: now,
+      );
+      
+      // Create submission with answers
+      await repository.createSubmission(submission);
+      
+      // Create answer records for each field
+      for (final field in _fields) {
+        final value = _answers[field.id];
+        if (value != null) {
+          final answer = SubmissionAnswer(
+            id: '${submission.id}_${field.id}',
+            submissionId: submission.id,
+            fieldId: field.id,
+            answerValue: _serializeValue(value),
+            answeredAt: now,
+          );
+          
+          await repository.saveAnswer(answer);
+        }
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Form submitted successfully'),
+            content: Text('Form submitted successfully!'),
             backgroundColor: Colors.green,
           ),
         );
-        context.pop();
+        
+        // Navigate back after a brief delay
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) {
+          context.pop();
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -232,7 +314,21 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
         );
       }
     } finally {
-      setState(() => _isSaving = false);
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+  
+  String _serializeValue(dynamic value) {
+    if (value is DateTime) {
+      return value.toIso8601String();
+    } else if (value is TimeOfDay) {
+      return '${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}';
+    } else if (value is List) {
+      return value.join(',');
+    } else {
+      return value.toString();
     }
   }
 
