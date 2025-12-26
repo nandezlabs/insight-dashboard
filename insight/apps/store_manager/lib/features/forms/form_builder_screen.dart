@@ -156,6 +156,127 @@ class _FormBuilderScreenState extends State<FormBuilderScreen>
         return 'File Upload Field';
     }
   }
+  
+  Future<void> _saveForm({bool publish = false}) async {
+    // Validation
+    if (_formTitleController.text.trim().isEmpty) {
+      _showError('Please enter a form title');
+      return;
+    }
+    
+    if (_fields.isEmpty) {
+      _showError('Please add at least one field to the form');
+      return;
+    }
+    
+    if (_scheduleType == FormScheduleType.tagBased && _selectedTags.isEmpty) {
+      _showError('Please select at least one tag for tag-based scheduling');
+      return;
+    }
+    
+    if (_scheduleType == FormScheduleType.custom && _customStartDate == null) {
+      _showError('Please select a start date for custom scheduling');
+      return;
+    }
+    
+    try {
+      _showLoading('Saving form...');
+      
+      // Create FormModel
+      final formModel = FormModel(
+        id: widget.existingForm?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        title: _formTitleController.text.trim(),
+        description: _formDescriptionController.text.trim().isEmpty 
+            ? null 
+            : _formDescriptionController.text.trim(),
+        tags: _selectedTags,
+        scheduleType: _scheduleType,
+        customStartDate: _customStartDate,
+        customEndDate: _customEndDate,
+        customTime: _customTime != null 
+            ? '${_customTime!.hour.toString().padLeft(2, '0')}:${_customTime!.minute.toString().padLeft(2, '0')}'
+            : null,
+        status: publish ? FormStatus.active : FormStatus.draft,
+        createdBy: 'current_user_id', // TODO: Get from auth
+        createdAt: widget.existingForm?.createdAt ?? DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      
+      // TODO: Save to FormRepository
+      // final formRepository = ref.read(formRepositoryProvider);
+      // final savedForm = widget.existingForm != null
+      //     ? await formRepository.updateForm(formModel)
+      //     : await formRepository.createForm(formModel);
+      
+      // Save fields
+      // for (var i = 0; i < _fields.length; i++) {
+      //   final field = _fields[i];
+      //   final fieldModel = Field(
+      //     id: field.id,
+      //     formId: savedForm.id,
+      //     fieldType: field.type,
+      //     label: field.label,
+      //     placeholder: field.placeholder,
+      //     isRequired: field.required,
+      //     order: i,
+      //     createdAt: DateTime.now(),
+      //   );
+      //   
+      //   await formRepository.createField(fieldModel);
+      // }
+      
+      Navigator.of(context).pop(); // Close loading
+      
+      _showSuccess(publish 
+          ? 'Form published successfully!' 
+          : 'Form saved as draft');
+      
+      // Navigate back after a delay
+      await Future.delayed(const Duration(seconds: 1));
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      Navigator.of(context).pop(); // Close loading
+      _showError('Failed to save form: $e');
+    }
+  }
+  
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+  
+  void _showSuccess(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+  
+  void _showLoading(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        content: Row(
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 20),
+            Text(message),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -189,16 +310,24 @@ class _FormBuilderScreenState extends State<FormBuilderScreen>
         ),
         actions: [
           TextButton.icon(
-            onPressed: () {
-              // TODO: Save form
-            },
-            icon: const Icon(Icons.save),
-            label: const Text('Save'),
+            onPressed: () => _saveForm(publish: false),
+            icon: const Icon(Icons.save_outlined),
+            label: const Text('Save Draft'),
             style: TextButton.styleFrom(
-              foregroundColor: AppColors.primary,
+              foregroundColor: AppColors.textSecondary,
             ),
           ),
           const SizedBox(width: 8),
+          FilledButton.icon(
+            onPressed: () => _saveForm(publish: true),
+            icon: const Icon(Icons.publish),
+            label: const Text('Publish'),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+          ),
+          const SizedBox(width: 16),
         ],
         bottom: TabBar(
           controller: _tabController,
