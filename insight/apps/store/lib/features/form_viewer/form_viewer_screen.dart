@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:insight_core/insight_core.dart';
 import 'package:insight_ui/insight_ui.dart';
 import '../../core/providers/app_providers.dart';
+import 'form_field_widgets.dart';
 
 class FormViewerScreen extends ConsumerStatefulWidget {
   final String formId;
@@ -21,14 +22,31 @@ class FormViewerScreen extends ConsumerStatefulWidget {
 
 class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
   final Map<String, dynamic> _answers = {};
+  final Map<String, String> _fieldErrors = {};
+  List<Field> _fields = [];
+  bool _isLoadingFields = true;
   bool _isSaving = false;
   DateTime? _lastSaveTime;
 
   @override
   void initState() {
     super.initState();
-    // Load existing submission if any
+    _loadFormFields();
     _loadExistingSubmission();
+  }
+  
+  Future<void> _loadFormFields() async {
+    try {
+      final repository = ref.read(formRepositoryProvider);
+      final fields = await repository.getFormFields(widget.formId);
+      setState(() {
+        _fields = fields..sort((a, b) => a.order.compareTo(b.order));
+        _isLoadingFields = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading fields: $e');
+      setState(() => _isLoadingFields = false);
+    }
   }
 
   Future<void> _loadExistingSubmission() async {
@@ -61,8 +79,80 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
   void _onAnswerChanged(String fieldId, dynamic value) {
     setState(() {
       _answers[fieldId] = value;
+      // Clear error when user starts typing
+      _fieldErrors.remove(fieldId);
     });
     _autoSave();
+  }
+  
+  bool _validateField(Field field) {
+    final value = _answers[field.id];
+    
+    // Check required
+    if (field.isRequired) {
+      if (value == null || 
+          (value is String && value.trim().isEmpty) ||
+          (value is List && value.isEmpty)) {
+        _fieldErrors[field.id] = 'This field is required';
+        return false;
+      }
+    }
+    
+    // Field-specific validation
+    if (value != null) {
+      switch (field.fieldType) {
+        case FieldType.email:
+          if (value is String) {
+            final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+            if (!emailRegex.hasMatch(value)) {
+              _fieldErrors[field.id] = 'Please enter a valid email';
+              return false;
+            }
+          }
+          break;
+          
+        case FieldType.phone:
+          if (value is String && value.length < 10) {
+            _fieldErrors[field.id] = 'Please enter a valid phone number';
+            return false;
+          }
+          break;
+          
+        case FieldType.number:
+          final rules = field.validationRules;
+          if (rules != null && value is num) {
+            if (rules['min'] != null && value < rules['min']) {
+              _fieldErrors[field.id] = 'Value must be at least ${rules["min"]}';
+              return false;
+            }
+            if (rules['max'] != null && value > rules['max']) {
+              _fieldErrors[field.id] = 'Value must be at most ${rules["max"]}';
+              return false;
+            }
+          }
+          break;
+          
+        default:
+          break;
+      }
+    }
+    
+    _fieldErrors.remove(field.id);
+    return true;
+  }
+  
+  bool _validateAllFields() {
+    bool isValid = true;
+    _fieldErrors.clear();
+    
+    for (final field in _fields) {
+      if (!_validateField(field)) {
+        isValid = false;
+      }
+    }
+    
+    setState(() {}); // Trigger rebuild to show errors
+    return isValid;
   }
 
   Future<void> _autoSave() async {
@@ -83,24 +173,32 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
   }
 
   int _getTotalFieldsCount() {
-    // In a real implementation, count fields from form sections
-    // For now, return a mock count
-    return 10;
+    return _fields.length;
+  }
+  
+  int _getAnsweredFieldsCount() {
+    int count = 0;
+    for (final field in _fields) {
+      final value = _answers[field.id];
+      if (value != null && 
+          (value is! String || value.trim().isNotEmpty) &&
+          (value is! List || value.isNotEmpty)) {
+        count++;
+      }
+    }
+    return count;
   }
 
   Future<void> _submitForm() async {
     final form = widget.form;
     if (form == null) return;
 
-    // Validate required fields
-    final totalFields = _getTotalFieldsCount();
-    final answeredFields = _answers.length;
-    
-    if (answeredFields < totalFields) {
+    // Validate all fields
+    if (!_validateAllFields()) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please fill in all required fields'),
+            content: Text('Please fix the errors before submitting'),
             backgroundColor: Colors.red,
           ),
         );
@@ -142,10 +240,10 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
   Widget build(BuildContext context) {
     final form = widget.form;
 
-    if (form == null) {
+    if (form == null || _isLoadingFields) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Form'),
+          title: Text(form?.title ?? 'Form'),
         ),
         body: const Center(
           child: CircularProgressIndicator(),
@@ -153,9 +251,8 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
       );
     }
 
-    // TODO: Load form sections and fields separately
-    final totalFields = 10; // Mock for now
-    final answeredFields = _answers.length;
+    final totalFields = _getTotalFieldsCount();
+    final answeredFields = _getAnsweredFieldsCount();
     final progress = totalFields > 0 ? answeredFields / totalFields : 0.0;
 
     return Scaffold(
@@ -244,13 +341,26 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
                     ),
                     const SizedBox(height: 24),
                   ],
-                  // TODO: Load form sections and fields from database
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(32.0),
-                      child: Text('Form fields will be loaded here'),
-                    ),
-                  ),
+                  // Render form fields
+                  if (_fields.isEmpty)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Text(
+                          'No fields found for this form',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    ..._fields.map((field) => FormFieldWidget(
+                      field: field,
+                      value: _answers[field.id],
+                      onChanged: (value) => _onAnswerChanged(field.id, value),
+                      errorText: _fieldErrors[field.id],
+                    )),
                 ],
               ),
             ),
