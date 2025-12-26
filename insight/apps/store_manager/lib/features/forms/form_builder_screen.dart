@@ -63,6 +63,14 @@ class _FormBuilderScreenState extends State<FormBuilderScreen>
   // Form fields state
   final List<FormFieldState> _fields = [];
   FormFieldState? _selectedField;
+  
+  // Form settings state
+  FormScheduleType _scheduleType = FormScheduleType.tagBased;
+  final List<String> _selectedTags = [];
+  DateTime? _customStartDate;
+  DateTime? _customEndDate;
+  TimeOfDay? _customTime;
+  final List<String> _assignedTeamIds = [];
 
   @override
   void initState() {
@@ -217,7 +225,21 @@ class _FormBuilderScreenState extends State<FormBuilderScreen>
             onSelectField: _selectField,
             onReorderFields: _reorderFields,
           ),
-          const _SettingsView(),
+          _SettingsView(
+            scheduleType: _scheduleType,
+            selectedTags: _selectedTags,
+            customStartDate: _customStartDate,
+            customEndDate: _customEndDate,
+            customTime: _customTime,
+            onScheduleTypeChanged: (type) => setState(() => _scheduleType = type),
+            onTagsChanged: (tags) => setState(() {
+              _selectedTags.clear();
+              _selectedTags.addAll(tags);
+            }),
+            onStartDateChanged: (date) => setState(() => _customStartDate = date),
+            onEndDateChanged: (date) => setState(() => _customEndDate = date),
+            onTimeChanged: (time) => setState(() => _customTime = time),
+          ),
           _PreviewView(fields: _fields),
         ],
       ),
@@ -600,13 +622,36 @@ class _FieldPaletteItem extends StatelessWidget {
 }
 
 class _SettingsView extends StatelessWidget {
-  const _SettingsView();
+  final FormScheduleType scheduleType;
+  final List<String> selectedTags;
+  final DateTime? customStartDate;
+  final DateTime? customEndDate;
+  final TimeOfDay? customTime;
+  final Function(FormScheduleType) onScheduleTypeChanged;
+  final Function(List<String>) onTagsChanged;
+  final Function(DateTime?) onStartDateChanged;
+  final Function(DateTime?) onEndDateChanged;
+  final Function(TimeOfDay?) onTimeChanged;
+
+  const _SettingsView({
+    required this.scheduleType,
+    required this.selectedTags,
+    required this.customStartDate,
+    required this.customEndDate,
+    required this.customTime,
+    required this.onScheduleTypeChanged,
+    required this.onTagsChanged,
+    required this.onStartDateChanged,
+    required this.onEndDateChanged,
+    required this.onTimeChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(32),
       children: [
+        // Schedule Type
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -618,20 +663,465 @@ class _SettingsView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Schedule Configuration',
+                'Schedule Type',
                 style: AppTextStyles.titleMedium.copyWith(
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                'Schedule type and frequency settings will be implemented here',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+              _ScheduleTypeSelector(
+                scheduleType: scheduleType,
+                onChanged: onScheduleTypeChanged,
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Tag-based Configuration
+        if (scheduleType == FormScheduleType.tagBased)
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Form Tags',
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Select tags to determine when this form appears',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _TagSelector(
+                  selectedTags: selectedTags,
+                  onChanged: onTagsChanged,
+                ),
+              ],
+            ),
+          ),
+
+        // Custom Schedule Configuration
+        if (scheduleType == FormScheduleType.custom)
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Custom Schedule',
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _CustomScheduleSelector(
+                  startDate: customStartDate,
+                  endDate: customEndDate,
+                  time: customTime,
+                  onStartDateChanged: onStartDateChanged,
+                  onEndDateChanged: onEndDateChanged,
+                  onTimeChanged: onTimeChanged,
+                ),
+              ],
+            ),
+          ),
+
+        const SizedBox(height: 16),
+
+        // Completion Settings
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Completion Settings',
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              SwitchListTile(
+                title: Text(
+                  'Require Geofence',
+                  style: AppTextStyles.bodyMedium,
+                ),
+                subtitle: Text(
+                  'Users must be on-site to complete this form',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                value: false,
+                onChanged: (value) {
+                  // TODO: Implement geofence requirement
+                },
+                contentPadding: EdgeInsets.zero,
+              ),
+              const Divider(),
+              SwitchListTile(
+                title: Text(
+                  'Allow Multiple Submissions',
+                  style: AppTextStyles.bodyMedium,
+                ),
+                subtitle: Text(
+                  'Users can submit this form multiple times',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                value: true,
+                onChanged: (value) {
+                  // TODO: Implement submission limit
+                },
+                contentPadding: EdgeInsets.zero,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ScheduleTypeSelector extends StatelessWidget {
+  final FormScheduleType scheduleType;
+  final Function(FormScheduleType) onChanged;
+
+  const _ScheduleTypeSelector({
+    required this.scheduleType,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _ScheduleTypeOption(
+          title: 'Tag-based Schedule',
+          description: 'Form appears based on selected tags (daily, weekly, period)',
+          value: FormScheduleType.tagBased,
+          groupValue: scheduleType,
+          onChanged: onChanged,
+        ),
+        const SizedBox(height: 12),
+        _ScheduleTypeOption(
+          title: 'Custom Schedule',
+          description: 'Set specific dates and times for form availability',
+          value: FormScheduleType.custom,
+          groupValue: scheduleType,
+          onChanged: onChanged,
+        ),
+        const SizedBox(height: 12),
+        _ScheduleTypeOption(
+          title: 'Manual',
+          description: 'Form only appears when manually assigned',
+          value: FormScheduleType.manual,
+          groupValue: scheduleType,
+          onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+}
+
+class _ScheduleTypeOption extends StatelessWidget {
+  final String title;
+  final String description;
+  final FormScheduleType value;
+  final FormScheduleType groupValue;
+  final Function(FormScheduleType) onChanged;
+
+  const _ScheduleTypeOption({
+    required this.title,
+    required this.description,
+    required this.value,
+    required this.groupValue,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = value == groupValue;
+    return GestureDetector(
+      onTap: () => onChanged(value),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : AppColors.background,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Radio<FormScheduleType>(
+              value: value,
+              groupValue: groupValue,
+              onChanged: (val) => onChanged(val!),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TagSelector extends StatelessWidget {
+  final List<String> selectedTags;
+  final Function(List<String>) onChanged;
+
+  const _TagSelector({
+    required this.selectedTags,
+    required this.onChanged,
+  });
+
+  static const availableTags = [
+    FormConstants.tagDaily,
+    FormConstants.tagWeekly,
+    FormConstants.tagPeriod,
+    FormConstants.tagOperations,
+    FormConstants.tagMain,
+  ];
+
+  String _getTagLabel(String tag) {
+    switch (tag) {
+      case FormConstants.tagDaily:
+        return 'Daily';
+      case FormConstants.tagWeekly:
+        return 'Weekly';
+      case FormConstants.tagPeriod:
+        return 'Period';
+      case FormConstants.tagOperations:
+        return 'Operations';
+      case FormConstants.tagMain:
+        return 'Main';
+      default:
+        return tag;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: availableTags.map((tag) {
+        final isSelected = selectedTags.contains(tag);
+        return FilterChip(
+          label: Text(_getTagLabel(tag)),
+          selected: isSelected,
+          onSelected: (selected) {
+            final newTags = List<String>.from(selectedTags);
+            if (selected) {
+              newTags.add(tag);
+            } else {
+              newTags.remove(tag);
+            }
+            onChanged(newTags);
+          },
+          selectedColor: AppColors.primary.withValues(alpha: 0.2),
+          checkmarkColor: AppColors.primary,
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _CustomScheduleSelector extends StatelessWidget {
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final TimeOfDay? time;
+  final Function(DateTime?) onStartDateChanged;
+  final Function(DateTime?) onEndDateChanged;
+  final Function(TimeOfDay?) onTimeChanged;
+
+  const _CustomScheduleSelector({
+    required this.startDate,
+    required this.endDate,
+    required this.time,
+    required this.onStartDateChanged,
+    required this.onEndDateChanged,
+    required this.onTimeChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Start Date
+        Text(
+          'Start Date',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: startDate ?? DateTime.now(),
+              firstDate: DateTime.now(),
+              lastDate: DateTime.now().add(const Duration(days: 365)),
+            );
+            onStartDateChanged(date);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.border),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 20),
+                const SizedBox(width: 12),
+                Text(
+                  startDate != null
+                      ? '${startDate!.month}/${startDate!.day}/${startDate!.year}'
+                      : 'Select start date',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: startDate != null ? AppColors.textPrimary : AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // End Date
+        Text(
+          'End Date (Optional)',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: endDate ?? startDate ?? DateTime.now(),
+              firstDate: startDate ?? DateTime.now(),
+              lastDate: DateTime.now().add(const Duration(days: 365)),
+            );
+            onEndDateChanged(date);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.border),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 20),
+                const SizedBox(width: 12),
+                Text(
+                  endDate != null
+                      ? '${endDate!.month}/${endDate!.day}/${endDate!.year}'
+                      : 'No end date',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: endDate != null ? AppColors.textPrimary : AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Time
+        Text(
+          'Preferred Time (Optional)',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () async {
+            final pickedTime = await showTimePicker(
+              context: context,
+              initialTime: time ?? TimeOfDay.now(),
+            );
+            onTimeChanged(pickedTime);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.border),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.access_time, size: 20),
+                const SizedBox(width: 12),
+                Text(
+                  time != null
+                      ? time!.format(context)
+                      : 'Select time',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: time != null ? AppColors.textPrimary : AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
