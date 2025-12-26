@@ -50,7 +50,7 @@ class FormSchedulerService {
     if (form.customStartDate != null && form.customEndDate != null) {
       final isWithinDateRange = now.isAfter(form.customStartDate!) &&
           now.isBefore(form.customEndDate!);
-      
+
       if (!isWithinDateRange) {
         return false;
       }
@@ -61,7 +61,7 @@ class FormSchedulerService {
       final parts = form.customTime!.split(':');
       final customHour = int.parse(parts[0]);
       final customMinute = int.parse(parts[1]);
-      
+
       final customDateTime = DateTime(
         now.year,
         now.month,
@@ -69,7 +69,7 @@ class FormSchedulerService {
         customHour,
         customMinute,
       );
-      
+
       return now.isAfter(customDateTime);
     }
 

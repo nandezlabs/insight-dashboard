@@ -3,7 +3,9 @@
 ## Navigation Structure
 
 ### Primary Navigation
+
 **Horizontal Tab Bar** (Top of Dashboard)
+
 - Overview (Default)
 - Forms
 - Analytics
@@ -67,6 +69,7 @@ Store Manager App
 ### 1. Overview (Dashboard)
 
 **Layout:**
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Store Manager                                    [Menu] │
@@ -105,6 +108,7 @@ Store Manager App
 ```
 
 **Interactions:**
+
 - Tap progress bars → View detailed submission list
 - Tap stat cards → View breakdown/analytics
 - Tap action cards → Navigate to respective screens
@@ -115,6 +119,7 @@ Store Manager App
 ### 2. Forms Library
 
 **Layout:**
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Store Manager                                    [Menu] │
@@ -145,6 +150,7 @@ Store Manager App
 ```
 
 **Interactions:**
+
 - Tap form card → Open form builder (edit mode)
 - Tap [⋮] menu → Duplicate, Archive, Delete, Analytics
 - Tap [+] FAB → Create new form (starts in builder)
@@ -155,6 +161,7 @@ Store Manager App
 ### 3. Form Builder - Creation Tab
 
 **Layout (Desktop/Tablet - 2 Column):**
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ ← Form Builder: Daily Operations                [Save] │
@@ -191,6 +198,7 @@ Store Manager App
 ```
 
 **Layout (Mobile - Single Column with Bottom Drawer):**
+
 ```
 ┌─────────────────────────────────────┐
 │ ← Daily Operations          [Save] │
@@ -219,12 +227,14 @@ Store Manager App
 ```
 
 **Edit Mode (Drag & Drop):**
+
 - Long press any field → Activates edit mode
 - Drag handles appear (≡)
 - Bottom palette shows field types to drag
 - Tap outside or "Done" to exit edit mode
 
 **Interactions:**
+
 - Tap field → Select & show properties in right panel
 - Drag field → Reorder
 - Tap [📝] → Edit inline
@@ -238,6 +248,7 @@ Store Manager App
 ### 4. Form Builder - Settings Tab
 
 **Layout:**
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ ← Form Builder: Daily Operations                [Save] │
@@ -293,6 +304,7 @@ Store Manager App
 ### 5. Settings Screen
 
 **Layout:**
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Store Manager                                    [Menu] │
@@ -397,16 +409,19 @@ Store Manager App
 ## Navigation Patterns
 
 ### Tab Navigation
+
 - Horizontal tabs stay visible at top
 - Active tab highlighted
 - Smooth transitions between tabs
 
 ### Back Navigation
+
 - "←" arrow in top left
 - Returns to previous screen
 - Maintains scroll position
 
 ### Modal/Sheet Navigation
+
 - Settings dialogs slide up from bottom
 - Dismiss with X or swipe down
 - Blur background

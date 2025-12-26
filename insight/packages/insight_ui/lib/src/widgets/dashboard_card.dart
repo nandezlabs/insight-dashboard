@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
 
 /// Reusable card widget for dashboard sections
 class DashboardCard extends StatelessWidget {

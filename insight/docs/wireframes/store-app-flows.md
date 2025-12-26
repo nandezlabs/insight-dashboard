@@ -3,7 +3,9 @@
 ## Navigation Structure
 
 ### Primary Navigation
+
 **Horizontal Tab Bar** (Top of Dashboard)
+
 - Overview (Default)
 - (Future features will add more tabs)
 
@@ -46,6 +48,7 @@ Store App
 ### 0. Geofence Check (Launch Screen)
 
 **Layout:**
+
 ```
 ┌─────────────────────────────────────┐
 │                                     │
@@ -63,9 +66,11 @@ Store App
 ```
 
 **If Location Valid:**
+
 - Smooth transition to Dashboard
 
 **If Location Invalid:**
+
 ```
 ┌─────────────────────────────────────┐
 │                                     │
@@ -86,6 +91,7 @@ Store App
 ### 1. Dashboard (Overview)
 
 **Layout (Mobile):**
+
 ```
 ┌─────────────────────────────────────┐
 │ Store                        [Menu] │
@@ -141,6 +147,7 @@ Store App
 ```
 
 **Forms Section (Scrolled Down):**
+
 ```
 ┌─────────────────────────────────────┐
 │                                     │
@@ -191,12 +198,14 @@ Store App
 ```
 
 **Status Indicators:**
+
 - ● Gray dot = Not Started
 - ● Blue dot = In Progress
 - ✓ Green check = Completed
 - ⚠️ Orange warning = Auto-Submitted
 
 **Interactions:**
+
 - **Tap form card** → Opens Form Viewer
 - **Pull to refresh** → Reload data
 - **Scroll sections** → View all content
@@ -207,6 +216,7 @@ Store App
 ### 2. Form Viewer (Scrollable Single Page)
 
 **Layout:**
+
 ```
 ┌─────────────────────────────────────┐
 │ ← Opening Checklist          [Save]│
@@ -264,6 +274,7 @@ Store App
 ```
 
 **Field Types Displayed:**
+
 - **Radio buttons** - Single choice (Yes/No, etc.)
 - **Checkboxes** - Multiple choice
 - **Text input** - Short answers
@@ -275,21 +286,24 @@ Store App
 - **File upload** - Photos/documents
 
 **Auto-save Behavior:**
+
 - Saves after each field change (500ms debounce)
 - Shows "Saving..." → "✓ Saved"
 - Works offline, syncs when online
 - Progress bar updates in real-time
 
 **Validation:**
-- Required fields marked with *
+
+- Required fields marked with \*
 - Can't submit until all required fields filled
 - Inline error messages
 - Red border on invalid fields
 
 **Interactions:**
+
 - **Fill out field** → Auto-saves
 - **Tap "← Back"** → Save and return to dashboard
-- **Tap "Submit"** → 
+- **Tap "Submit"** →
   - Validates all fields
   - If valid: Confirm dialog → Submit → Return to dashboard
   - If invalid: Scroll to first error, show message
@@ -299,6 +313,7 @@ Store App
 ### 3. Completed Form View (Read-only)
 
 **Layout:**
+
 ```
 ┌─────────────────────────────────────┐
 │ ← Closing Checklist                │
@@ -330,6 +345,7 @@ Store App
 ```
 
 **Auto-Submitted Form:**
+
 - Same layout
 - Orange banner: "⚠️ Auto-Submitted"
 - Shows "No Response" for empty fields
@@ -396,23 +412,27 @@ Store App
 ## Interaction Patterns
 
 ### Pull to Refresh
+
 - Dashboard pulls down
 - Shows loading spinner
 - Refreshes all data
 
 ### Auto-save Feedback
+
 - Small indicator in top bar
 - "Saving..." with spinner
 - "✓ Saved" with checkmark (2 sec)
 - Haptic feedback on save
 
 ### Form Navigation
+
 - Smooth scrolling
 - Sticky progress bar at top
 - Sections with dividers
 - Auto-scroll to validation errors
 
 ### Offline Behavior
+
 - Yellow banner: "Offline - Changes saved locally"
 - Forms still work
 - Syncs when back online
@@ -423,6 +443,7 @@ Store App
 ## Empty States
 
 ### No Forms Available
+
 ```
 ┌─────────────────────────────────────┐
 │                                     │
@@ -436,6 +457,7 @@ Store App
 ```
 
 ### Loading State
+
 ```
 ┌─────────────────────────────────────┐
 │                                     │
@@ -451,12 +473,14 @@ Store App
 ## Color Coding
 
 **Form Status Colors:**
+
 - Not Started: Gray border, gray dot
 - In Progress: Blue border, blue dot, progress bar
 - Completed: Green border, green checkmark
 - Auto-Submitted: Orange border, orange warning icon
 
 **KPI Cards:**
+
 - Positive trend: Green arrow ↑
 - Negative trend: Red arrow ↓
 - Neutral: Gray text
@@ -464,6 +488,7 @@ Store App
 ---
 
 Next step: Would you like me to:
+
 1. Create more detailed component specs?
 2. Design the interaction animations?
 3. Create a clickable prototype guide?

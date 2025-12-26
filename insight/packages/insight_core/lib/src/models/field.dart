@@ -47,8 +47,7 @@ class Field with _$Field {
     required DateTime createdAt,
   }) = _Field;
 
-  factory Field.fromJson(Map<String, dynamic> json) =>
-      _$FieldFromJson(json);
+  factory Field.fromJson(Map<String, dynamic> json) => _$FieldFromJson(json);
 }
 
 @freezed

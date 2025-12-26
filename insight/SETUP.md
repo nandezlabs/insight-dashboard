@@ -55,6 +55,7 @@ melos bootstrap
 ### 3. **Run Database Migration**
 
 In your Supabase Dashboard:
+
 1. Go to **SQL Editor**
 2. Create a new query
 3. I'll provide you the complete SQL schema next
@@ -62,6 +63,7 @@ In your Supabase Dashboard:
 ### 4. **Create the Apps** (Store Manager + Store)
 
 Once Melos bootstrap completes successfully, I'll create:
+
 - Store Manager app with Flutter
 - Store app with Flutter
 - Both configured for iOS, Android, and macOS
@@ -69,6 +71,7 @@ Once Melos bootstrap completes successfully, I'll create:
 ## 📋 What's Included
 
 ### Shared Core Package (`insight_core`)
+
 - ✅ Complete data models (Team, Forms, Fields, Submissions, etc.)
 - ✅ Supabase integration
 - ✅ Business calendar system
@@ -79,6 +82,7 @@ Once Melos bootstrap completes successfully, I'll create:
 - ✅ Complete repositories for data access
 
 ### Shared UI Package (`insight_ui`)
+
 - ✅ Modern flat design theme
 - ✅ Custom color palette
 - ✅ Typography system
@@ -87,12 +91,14 @@ Once Melos bootstrap completes successfully, I'll create:
 ## 🎨 Design System
 
 **Colors:**
+
 - Primary: Indigo (`#6366F1`)
 - Accent: Gold (`#FBBF24`)
 - Status colors for forms
 - Flat design with minimal elevation
 
 **Components:**
+
 - Dashboard cards
 - Stat cards (for KPIs)
 - Progress indicators
@@ -125,6 +131,7 @@ cd /Users/nandez/developer/insight && melos bootstrap
 ```
 
 Then let me know when it's complete, and I'll:
+
 1. Provide the Supabase SQL schema
 2. Create both Flutter apps
 3. Set up environment configuration

@@ -6,7 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class EncryptionService {
   static const String _keyStorageKey = 'encryption_key';
   static final _secureStorage = const FlutterSecureStorage();
-  
+
   static encrypt.Key? _encryptionKey;
   static encrypt.IV? _iv;
 
@@ -14,7 +14,7 @@ class EncryptionService {
   static Future<void> initialize() async {
     // Try to get existing key
     String? keyString = await _secureStorage.read(key: _keyStorageKey);
-    
+
     if (keyString == null) {
       // Generate new key if doesn't exist
       _encryptionKey = encrypt.Key.fromSecureRandom(32);
@@ -26,7 +26,7 @@ class EncryptionService {
       // Use existing key
       _encryptionKey = encrypt.Key(base64Decode(keyString));
     }
-    
+
     // Generate IV (can be stored with encrypted data)
     _iv = encrypt.IV.fromLength(16);
   }
@@ -40,9 +40,9 @@ class EncryptionService {
     final encrypter = encrypt.Encrypter(
       encrypt.AES(_encryptionKey!, mode: encrypt.AESMode.cbc),
     );
-    
+
     final encrypted = encrypter.encrypt(plainText, iv: _iv);
-    
+
     // Return combined IV and encrypted data
     return '${_iv!.base64}:${encrypted.base64}';
   }

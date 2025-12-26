@@ -9,15 +9,15 @@ class Formatters {
   static final _numberFormat = NumberFormat('#,##0.##');
 
   static String date(DateTime date) => _dateFormat.format(date);
-  
+
   static String time(DateTime time) => _timeFormat.format(time);
-  
+
   static String dateTime(DateTime dateTime) => _dateTimeFormat.format(dateTime);
-  
+
   static String currency(double amount) => _currencyFormat.format(amount);
-  
+
   static String percent(double value) => _percentFormat.format(value / 100);
-  
+
   static String number(double value) => _numberFormat.format(value);
 
   static String relativeTime(DateTime dateTime) {

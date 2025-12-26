@@ -26,4 +26,10 @@ class AppConstants {
 
   // API
   static const Duration apiTimeout = Duration(seconds: 30);
+  
+  // API Base URL - Use Tailscale IP for remote access
+  static const String apiBaseUrl = 'http://100.112.230.47:8000';
+  
+  // For local development, uncomment the line below:
+  // static const String apiBaseUrl = 'http://localhost:8000';
 }

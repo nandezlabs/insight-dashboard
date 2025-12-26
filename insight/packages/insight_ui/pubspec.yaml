@@ -9,17 +9,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
+
   # Shared core package
   insight_core:
     path: ../insight_core
-  
+
   # State Management
   flutter_riverpod: ^2.6.1
-  
+
   # Charts
   fl_chart: ^0.69.2
-  
+
   # Icons
   cupertino_icons: ^1.0.8
 

@@ -24,6 +24,5 @@ class Goal with _$Goal {
     required DateTime createdAt,
   }) = _Goal;
 
-  factory Goal.fromJson(Map<String, dynamic> json) =>
-      _$GoalFromJson(json);
+  factory Goal.fromJson(Map<String, dynamic> json) => _$GoalFromJson(json);
 }

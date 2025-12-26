@@ -4,16 +4,16 @@ class BusinessCalendarService {
   static BusinessPeriod calculateCurrentPeriod(DateTime startDate) {
     final now = DateTime.now();
     final daysSinceStart = now.difference(startDate).inDays;
-    
+
     // 7 days in a week, starting Sunday
     final week = ((daysSinceStart ~/ 7) % 4) + 1; // 1-4
-    
+
     // 28 days (4 weeks) in a period
     final period = ((daysSinceStart ~/ 28) % 13) + 1; // 1-13
-    
+
     // 3 periods in a quarter
     final quarter = ((period - 1) ~/ 3) + 1; // 1-4
-    
+
     return BusinessPeriod(
       week: week,
       period: period,

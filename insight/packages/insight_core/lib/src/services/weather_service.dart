@@ -42,14 +42,14 @@ class WeatherService {
   /// Get weather icon based on condition
   static String getWeatherIcon(Weather weather) {
     final main = weather.weatherMain?.toLowerCase() ?? '';
-    
+
     if (main.contains('clear')) return '☀️';
     if (main.contains('cloud')) return '☁️';
     if (main.contains('rain')) return '🌧️';
     if (main.contains('thunder')) return '⛈️';
     if (main.contains('snow')) return '❄️';
     if (main.contains('mist') || main.contains('fog')) return '🌫️';
-    
+
     return '🌤️';
   }
 }

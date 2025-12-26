@@ -7,7 +7,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      
+
       // Color scheme
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
@@ -20,10 +20,10 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
         surfaceContainerHighest: AppColors.surfaceVariant,
       ),
-      
+
       // Scaffold
       scaffoldBackgroundColor: AppColors.background,
-      
+
       // App bar
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
@@ -32,21 +32,21 @@ class AppTheme {
         centerTitle: false,
         titleTextStyle: AppTextStyles.titleLarge,
       ),
-      
+
       // Card (flat design - minimal shadow)
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         color: AppColors.surface,
         elevation: 0, // Flat design
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          side: BorderSide(
             color: AppColors.border,
             width: 1,
           ),
         ),
-        margin: const EdgeInsets.all(8),
+        margin: EdgeInsets.all(8),
       ),
-      
+
       // Text theme
       textTheme: const TextTheme(
         displayLarge: AppTextStyles.displayLarge,
@@ -65,7 +65,7 @@ class AppTheme {
         labelMedium: AppTextStyles.labelMedium,
         labelSmall: AppTextStyles.labelSmall,
       ),
-      
+
       // Input decoration
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -99,7 +99,7 @@ class AppTheme {
           color: AppColors.textTertiary,
         ),
       ),
-      
+
       // Elevated button (flat with color)
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -116,7 +116,7 @@ class AppTheme {
           textStyle: AppTextStyles.labelLarge,
         ),
       ),
-      
+
       // Text button
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
@@ -131,7 +131,7 @@ class AppTheme {
           textStyle: AppTextStyles.labelLarge,
         ),
       ),
-      
+
       // Outlined button
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -147,21 +147,21 @@ class AppTheme {
           textStyle: AppTextStyles.labelLarge,
         ),
       ),
-      
+
       // Icon button
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
           foregroundColor: AppColors.textSecondary,
         ),
       ),
-      
+
       // Floating action button
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         elevation: 0, // Flat design
       ),
-      
+
       // Bottom navigation bar
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.surface,
@@ -172,14 +172,14 @@ class AppTheme {
         selectedLabelStyle: AppTextStyles.labelSmall,
         unselectedLabelStyle: AppTextStyles.labelSmall,
       ),
-      
+
       // Divider
       dividerTheme: const DividerThemeData(
         color: AppColors.border,
         thickness: 1,
         space: 1,
       ),
-      
+
       // Chip
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariant,
@@ -190,7 +190,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
-      
+
       // Progress indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,

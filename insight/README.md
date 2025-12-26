@@ -9,15 +9,18 @@ insight/
 ├── apps/
 │   ├── store_manager/    # Manager app for form creation and analytics
 │   └── store/            # Store app for form completion
+├── backend/              # FastAPI server for NAS deployment
 ├── packages/
 │   ├── insight_core/     # Shared business logic and data models
 │   └── insight_ui/       # Shared UI components and themes
+├── supabase/             # Database schema and setup
 └── melos.yaml           # Monorepo configuration
 ```
 
 ## Features
 
 ### Store Manager
+
 - Drag-and-drop form builder with multi-level templates
 - Business calendar tracking (Week/Period/Quarter)
 - Real-time progress monitoring
@@ -25,6 +28,7 @@ insight/
 - Analytics dashboard with KPIs
 
 ### Store
+
 - Intuitive form completion interface
 - Auto-save functionality
 - Operations dashboard with today's metrics
@@ -34,11 +38,13 @@ insight/
 ## Tech Stack
 
 - **Framework**: Flutter (iOS, Android, macOS)
-- **Backend**: Supabase (PostgreSQL, Real-time, Storage)
+- **Backend**: FastAPI (Python) + PostgreSQL on UGREEN NAS
+- **Networking**: Tailscale VPN for secure remote access
 - **State Management**: Riverpod
 - **Routing**: Go Router
 - **Local Storage**: Drift (SQLite) with encryption
 - **Monorepo**: Melos
+- **Deployment**: Docker + Docker Compose
 
 ## Getting Started
 
@@ -53,25 +59,48 @@ insight/
 ### Setup
 
 1. Install Melos:
+
 ```bash
 dart pub global activate melos
 ```
 
 2. Bootstrap the project:
-```bash
+
+````bash
 melos bootstrap
-```
+```Set up backend on your NAS (see `backend/DEPLOYMENT.md`)
 
-3. Create `.env` files in both apps (see `.env.example`)
+4. Create `.env` files in both apps with your Tailscale IP
 
-4. Run the apps:
+5. Run the apps:
+
 ```bash
 # Store Manager
 cd apps/store_manager && flutter run
 
 # Store
 cd apps/store && flutter run
+````
+
+### Backend Deployment
+
+Deploy the FastAPI backend on your UGREEN NAS:
+
+```bash
+cd backend
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# Deploy with one command
+./deploy.sh
 ```
+
+See [backend/DEPLOYMENT.md](backend/DEPLOYMENT.md) for detailed instructions.tore
+cd apps/store && flutter run
+
+````
 
 ## Development
 
@@ -83,7 +112,7 @@ melos format       # Format all code
 melos test         # Run all tests
 melos clean        # Clean all packages
 melos get          # Get dependencies
-```
+````
 
 ### Building
 

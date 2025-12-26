@@ -3,6 +3,7 @@
 ## Overview
 
 **Database Solution:** SQLite with Remote Sync
+
 - **Local Storage:** Each app has its own SQLite database (offline-first)
 - **Central Database:** PostgreSQL on UGREEN NAS
 - **Sync Strategy:** Bi-directional sync when devices are online
@@ -65,6 +66,7 @@
 #### Common Tables (Both Apps)
 
 **1. sync_metadata**
+
 ```sql
 CREATE TABLE sync_metadata (
     id INTEGER PRIMARY KEY,
@@ -75,6 +77,7 @@ CREATE TABLE sync_metadata (
 ```
 
 **2. pending_changes**
+
 ```sql
 CREATE TABLE pending_changes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,6 +91,7 @@ CREATE TABLE pending_changes (
 ```
 
 **3. business_calendar**
+
 ```sql
 CREATE TABLE business_calendar (
     id TEXT PRIMARY KEY,
@@ -100,6 +104,7 @@ CREATE TABLE business_calendar (
 ```
 
 **4. timeframes**
+
 ```sql
 CREATE TABLE timeframes (
     id TEXT PRIMARY KEY,
@@ -112,6 +117,7 @@ CREATE TABLE timeframes (
 ```
 
 **5. team**
+
 ```sql
 CREATE TABLE team (
     id TEXT PRIMARY KEY,
@@ -122,6 +128,7 @@ CREATE TABLE team (
 ```
 
 **6. forms**
+
 ```sql
 CREATE TABLE forms (
     id TEXT PRIMARY KEY,
@@ -143,6 +150,7 @@ CREATE TABLE forms (
 ```
 
 **7. form_sections**
+
 ```sql
 CREATE TABLE form_sections (
     id TEXT PRIMARY KEY,
@@ -156,6 +164,7 @@ CREATE TABLE form_sections (
 ```
 
 **8. fields**
+
 ```sql
 CREATE TABLE fields (
     id TEXT PRIMARY KEY,
@@ -179,6 +188,7 @@ CREATE TABLE fields (
 ```
 
 **9. dropdown_options**
+
 ```sql
 CREATE TABLE dropdown_options (
     id TEXT PRIMARY KEY,
@@ -191,6 +201,7 @@ CREATE TABLE dropdown_options (
 ```
 
 **10. submissions**
+
 ```sql
 CREATE TABLE submissions (
     id TEXT PRIMARY KEY,
@@ -209,6 +220,7 @@ CREATE TABLE submissions (
 ```
 
 **11. submission_answers**
+
 ```sql
 CREATE TABLE submission_answers (
     id TEXT PRIMARY KEY,
@@ -226,6 +238,7 @@ CREATE TABLE submission_answers (
 #### Store Manager Specific Tables
 
 **12. field_templates**
+
 ```sql
 CREATE TABLE field_templates (
     id TEXT PRIMARY KEY,
@@ -244,6 +257,7 @@ CREATE TABLE field_templates (
 ```
 
 **13. form_assignments**
+
 ```sql
 CREATE TABLE form_assignments (
     id TEXT PRIMARY KEY,
@@ -260,6 +274,7 @@ CREATE TABLE form_assignments (
 #### Store App Specific Tables
 
 **14. kpi_data**
+
 ```sql
 CREATE TABLE kpi_data (
     id TEXT PRIMARY KEY,
@@ -275,6 +290,7 @@ CREATE TABLE kpi_data (
 ```
 
 **15. goals**
+
 ```sql
 CREATE TABLE goals (
     id TEXT PRIMARY KEY,
@@ -286,6 +302,7 @@ CREATE TABLE goals (
 ```
 
 **16. team_schedule**
+
 ```sql
 CREATE TABLE team_schedule (
     id TEXT PRIMARY KEY,
@@ -298,6 +315,7 @@ CREATE TABLE team_schedule (
 ```
 
 **17. manager_notes**
+
 ```sql
 CREATE TABLE manager_notes (
     id TEXT PRIMARY KEY,
@@ -309,6 +327,7 @@ CREATE TABLE manager_notes (
 ```
 
 **18. geofence_settings**
+
 ```sql
 CREATE TABLE geofence_settings (
     id TEXT PRIMARY KEY,
@@ -326,6 +345,7 @@ CREATE TABLE geofence_settings (
 ## Central Database (PostgreSQL on NAS)
 
 Same schema as SQLite but with additional features:
+
 - **Timestamps with timezone** support
 - **JSON/JSONB** for validation_rules, conditional_logic
 - **Full-text search** on forms, fields
@@ -333,6 +353,7 @@ Same schema as SQLite but with additional features:
 - **Version tracking** for conflict resolution
 
 **Additional Version Tracking:**
+
 ```sql
 ALTER TABLE forms ADD COLUMN version INTEGER DEFAULT 1;
 ALTER TABLE submissions ADD COLUMN version INTEGER DEFAULT 1;
@@ -344,6 +365,7 @@ ALTER TABLE submissions ADD COLUMN version INTEGER DEFAULT 1;
 ## Sync Strategy
 
 ### 1. Offline-First Approach
+
 - All operations work locally first
 - Changes queued in `pending_changes` table
 - Sync happens in background when online
@@ -351,6 +373,7 @@ ALTER TABLE submissions ADD COLUMN version INTEGER DEFAULT 1;
 ### 2. Sync Flow
 
 **Store Manager → Central DB:**
+
 ```
 1. Create/Edit form locally (SQLite)
 2. Add to pending_changes queue
@@ -362,6 +385,7 @@ ALTER TABLE submissions ADD COLUMN version INTEGER DEFAULT 1;
 ```
 
 **Central DB → Store App:**
+
 ```
 1. Store app checks for assigned forms (on launch/refresh)
 2. Request forms newer than last_sync_version
@@ -371,6 +395,7 @@ ALTER TABLE submissions ADD COLUMN version INTEGER DEFAULT 1;
 ```
 
 **Store App → Central DB (Submissions):**
+
 ```
 1. User answers questions (auto-save to SQLite)
 2. Each answer queued in pending_changes
@@ -382,11 +407,13 @@ ALTER TABLE submissions ADD COLUMN version INTEGER DEFAULT 1;
 ### 3. Conflict Resolution
 
 **Last Write Wins (LWW):**
+
 - Each record has `updated_at` timestamp
 - Conflicts resolved by comparing timestamps
 - Server version always wins (Store Manager authoritative)
 
 **For Submissions:**
+
 - Store app can't conflict (only creates/updates own submissions)
 - Auto-submitted submissions locked (read-only)
 
@@ -395,6 +422,7 @@ ALTER TABLE submissions ADD COLUMN version INTEGER DEFAULT 1;
 ## API Endpoints (NAS Server)
 
 ### Authentication
+
 ```
 POST /api/auth/device
 - Register device
@@ -402,6 +430,7 @@ POST /api/auth/device
 ```
 
 ### Sync Endpoints
+
 ```
 GET  /api/sync/forms?since={version}
 POST /api/sync/forms
@@ -419,6 +448,7 @@ GET  /api/sync/full
 ```
 
 ### Status Endpoints
+
 ```
 GET /api/status
 - Server health check
@@ -432,6 +462,7 @@ GET /api/sync/status
 ## Technology Stack
 
 ### Local Database (Both Apps)
+
 - **Drift** (Flutter ORM)
   - Type-safe queries
   - Auto-migration
@@ -439,6 +470,7 @@ GET /api/sync/status
   - Built-in encryption support
 
 ### Central Database (NAS)
+
 - **PostgreSQL 16**
   - Reliable, mature
   - JSON support
@@ -446,7 +478,9 @@ GET /api/sync/status
   - Lightweight on NAS
 
 ### API Server (NAS)
+
 **Option A: Node.js + Express**
+
 ```javascript
 - Lightweight
 - Easy to deploy
@@ -454,6 +488,7 @@ GET /api/sync/status
 ```
 
 **Option B: Python + FastAPI**
+
 ```python
 - Modern, fast
 - Auto-generated docs
@@ -470,7 +505,7 @@ GET /api/sync/status
 ### Docker Compose Setup
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -515,6 +550,7 @@ services:
 ```
 
 ### File Structure on NAS
+
 ```
 /volume1/docker/insight/
 ├── docker-compose.yml
@@ -537,16 +573,19 @@ services:
 ## Security
 
 ### 1. Network Security
+
 - **Tailscale VPN:** All traffic encrypted
 - **No port forwarding:** Only accessible via VPN
 - **MagicDNS:** Use `insight-nas` instead of IP
 
 ### 2. Data Security
+
 - **Local encryption:** SQLite database encrypted with Drift
 - **TLS in transit:** HTTPS for API calls
 - **API tokens:** Device-specific auth tokens
 
 ### 3. Sensitive Data
+
 - Encrypted fields in database:
   - Team member info
   - Submission answers (if sensitive)
@@ -557,6 +596,7 @@ services:
 ## Performance Optimization
 
 ### Indexes
+
 ```sql
 -- Local SQLite
 CREATE INDEX idx_forms_status ON forms(status);
@@ -570,11 +610,13 @@ CREATE INDEX idx_submissions_date_range ON submissions(submission_date) WHERE st
 ```
 
 ### Caching
+
 - **Store Manager:** Cache form templates, field types
 - **Store App:** Cache active forms for current period
 - **API:** Redis for frequently accessed data (optional)
 
 ### Background Sync
+
 - **Exponential backoff** on failures
 - **Batch operations** for multiple changes
 - **Delta sync** (only changed records)
@@ -584,21 +626,25 @@ CREATE INDEX idx_submissions_date_range ON submissions(submission_date) WHERE st
 ## Migration Strategy
 
 ### Phase 1: Local Development (Now)
+
 1. Build apps with SQLite only
 2. Mock sync responses
 3. Test offline functionality
 
 ### Phase 2: NAS Setup (Week 2-3)
+
 1. Deploy PostgreSQL on NAS
 2. Create schema
 3. Set up Tailscale
 
 ### Phase 3: API Development (Week 3-4)
+
 1. Build FastAPI server
 2. Implement sync endpoints
 3. Test with apps
 
 ### Phase 4: Integration (Week 4-5)
+
 1. Connect apps to API
 2. Test sync flows
 3. Handle edge cases
@@ -608,6 +654,7 @@ CREATE INDEX idx_submissions_date_range ON submissions(submission_date) WHERE st
 ## Backup Strategy
 
 ### Automated Backups
+
 ```bash
 # Daily PostgreSQL backup
 0 2 * * * pg_dump insight > /backups/insight_$(date +\%Y\%m\%d).sql
@@ -617,6 +664,7 @@ CREATE INDEX idx_submissions_date_range ON submissions(submission_date) WHERE st
 ```
 
 ### Retention Policy
+
 - Daily backups: Keep 7 days
 - Weekly backups: Keep 4 weeks
 - Monthly backups: Keep 6 months
