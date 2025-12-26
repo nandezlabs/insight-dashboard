@@ -7,7 +7,7 @@ import 'core/router/app_router.dart';
 void main() {
   // Initialize API client with backend URL
   ApiClient.initialize(baseUrl: AppConstants.apiBaseUrl);
-  
+
   runApp(
     const ProviderScope(
       child: MyApp(),
@@ -15,15 +15,17 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(goRouterProvider);
+
     return MaterialApp.router(
       title: 'Insight Store Manager',
       theme: AppTheme.lightTheme,
-      routerConfig: goRouter,
+      routerConfig: router,
       debugShowCheckedModeBanner: false,
     );
   }

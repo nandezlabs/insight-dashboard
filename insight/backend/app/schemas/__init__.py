@@ -192,6 +192,51 @@ class SubmissionAnswerResponse(SubmissionAnswerBase):
     answered_at: datetime
 
 
+# User/Auth schemas
+class UserBase(BaseSchema):
+    """User base schema."""
+
+    email: str
+    full_name: str
+
+
+class UserCreate(UserBase):
+    """User creation schema."""
+
+    password: str
+
+
+class UserLogin(BaseSchema):
+    """User login schema."""
+
+    email: str
+    password: str
+
+
+class UserResponse(UserBase):
+    """User response schema."""
+
+    id: UUID
+    is_active: bool
+    is_superuser: bool
+    team_member_id: Optional[UUID] = None
+    created_at: datetime
+
+
+class Token(BaseSchema):
+    """Token response schema."""
+
+    access_token: str
+    token_type: str
+    user: UserResponse
+
+
+class TokenData(BaseSchema):
+    """Token data schema."""
+
+    email: str
+
+
 # Sync schemas
 class SyncPullRequest(BaseSchema):
     """Sync pull request schema."""

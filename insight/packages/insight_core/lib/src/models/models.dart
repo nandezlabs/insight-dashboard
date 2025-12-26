@@ -8,3 +8,4 @@ export 'goal.dart';
 export 'kpi_data.dart';
 export 'geofence_settings.dart';
 export 'sync.dart';
+export 'user.dart';

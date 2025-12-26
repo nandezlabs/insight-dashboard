@@ -2,11 +2,12 @@
 
 from fastapi import APIRouter
 
-from app.api.v1 import sync, team, forms, submissions
+from app.api.v1 import sync, team, forms, submissions, auth
 
 api_router = APIRouter()
 
 # Include sub-routers
+api_router.include_router(auth.router)
 api_router.include_router(sync.router)
 api_router.include_router(team.router)
 api_router.include_router(forms.router)

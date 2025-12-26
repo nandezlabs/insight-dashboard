@@ -1,3 +1,4 @@
+export 'auth_repository.dart';
 export 'form_repository.dart';
 export 'submission_repository.dart';
 export 'team_repository.dart';
