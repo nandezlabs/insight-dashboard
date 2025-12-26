@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:insight_core/insight_core.dart';
 import 'package:insight_ui/insight_ui.dart';
 import '../../core/providers/app_providers.dart';
+import '../analytics/models/completion_stats.dart';
 
 class OverviewScreen extends ConsumerWidget {
   const OverviewScreen({super.key});
@@ -216,7 +217,7 @@ class _StatisticsSection extends StatelessWidget {
         Expanded(
           child: StatCard(
             label: 'Completion Rate',
-            value: '${(stats.completionRate * 100).toStringAsFixed(0)}%',
+            value: '${stats.completionRate.toStringAsFixed(0)}%',
             icon: Icons.check_circle_outline,
             iconColor: AppColors.success,
           ),
@@ -224,8 +225,8 @@ class _StatisticsSection extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: StatCard(
-            label: 'User Submitted',
-            value: '${(stats.userSubmitRate * 100).toStringAsFixed(0)}%',
+            label: 'Total Submissions',
+            value: '${stats.totalSubmissions}',
             icon: Icons.person_outline,
             iconColor: AppColors.primary,
           ),
@@ -233,8 +234,8 @@ class _StatisticsSection extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: StatCard(
-            label: 'Auto Submitted',
-            value: '${stats.autoSubmittedCount}',
+            label: 'Active Forms',
+            value: '${stats.activeForms}',
             icon: Icons.auto_awesome,
             iconColor: AppColors.warning,
           ),

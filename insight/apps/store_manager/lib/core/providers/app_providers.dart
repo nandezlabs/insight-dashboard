@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:insight_core/insight_core.dart';
+import '../../features/analytics/models/completion_stats.dart';
 
 // ============================================================================
 // Business Calendar Providers
@@ -103,51 +104,55 @@ final goalsProvider = FutureProvider<List<Goal>>((ref) async {
 
 final completionStatsProvider = FutureProvider<CompletionStats>((ref) async {
   final submissions = await ref.watch(submissionsProvider.future);
+  final forms = await ref.watch(formsListProvider.future);
+  final activeForms = forms.where((f) => f.status == FormStatus.active).length;
   
   if (submissions.isEmpty) {
     return CompletionStats(
-      totalForms: 0,
-      completedForms: 0,
-      userSubmittedCount: 0,
-      autoSubmittedCount: 0,
+      totalSubmissions: 0,
       completionRate: 0.0,
-      userSubmitRate: 0.0,
+      averageCompletionTime: 0.0,
+      activeForms: activeForms,
+      submissionsByForm: {},
+      dailySubmissions: [],
     );
   }
   
-  final totalForms = submissions.length;
-  final completedForms = submissions.where((s) => s.status == SubmissionStatus.completed).length;
-  final userSubmitted = submissions.where((s) => s.status == SubmissionStatus.completed && !s.isAutoSubmitted).length;
-  final autoSubmitted = submissions.where((s) => s.isAutoSubmitted == true).length;
+  // Calculate total submissions
+  final totalSubmissions = submissions.length;
+  
+  // Calculate completion rate
+  final completedSubmissions = submissions.where(
+    (s) => s.status == SubmissionStatus.completed || s.status == SubmissionStatus.autoSubmitted
+  ).length;
+  final completionRate = totalSubmissions > 0 
+      ? (completedSubmissions / totalSubmissions) * 100 
+      : 0.0;
+  
+  // Calculate average completion time (mock for now)
+  // TODO: Implement proper time tracking in submissions
+  final averageCompletionTime = 15.0;
+  
+  // Group submissions by form
+  final submissionsByForm = <String, int>{};
+  for (final submission in submissions) {
+    submissionsByForm[submission.formId] = 
+        (submissionsByForm[submission.formId] ?? 0) + 1;
+  }
+  
+  // Group submissions by day (last 7 days for now)
+  final dailySubmissions = <DailySubmission>[];
+  // TODO: Implement daily grouping when we have proper date queries
   
   return CompletionStats(
-    totalForms: totalForms,
-    completedForms: completedForms,
-    userSubmittedCount: userSubmitted,
-    autoSubmittedCount: autoSubmitted,
-    completionRate: totalForms > 0 ? completedForms / totalForms : 0.0,
-    userSubmitRate: totalForms > 0 ? userSubmitted / totalForms : 0.0,
+    totalSubmissions: totalSubmissions,
+    completionRate: completionRate,
+    averageCompletionTime: averageCompletionTime,
+    activeForms: activeForms,
+    submissionsByForm: submissionsByForm,
+    dailySubmissions: dailySubmissions,
   );
 });
 
-// ============================================================================
-// Data Classes
-// ============================================================================
-
-class CompletionStats {
-  final int totalForms;
-  final int completedForms;
-  final int userSubmittedCount;
-  final int autoSubmittedCount;
-  final double completionRate;
-  final double userSubmitRate;
-
-  CompletionStats({
-    required this.totalForms,
-    required this.completedForms,
-    required this.userSubmittedCount,
-    required this.autoSubmittedCount,
-    required this.completionRate,
-    required this.userSubmitRate,
-  });
-}
+// Alias for backward compatibility
+final formsProvider = formsListProvider;
