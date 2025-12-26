@@ -4,7 +4,7 @@ import '../services/api_client.dart';
 class SubmissionRepository {
   /// Get all submissions for a form
   Future<List<Submission>> getFormSubmissions(String formId) async {
-    final response = await ApiClient.get('/api/forms/$formId/submissions');
+    final response = await ApiClient.get('/api/v1/submissions/form/$formId');
     return (response.data as List)
         .map((json) => Submission.fromJson(json))
         .toList();
@@ -13,9 +13,9 @@ class SubmissionRepository {
   /// Get submission by ID
   Future<Submission?> getSubmissionById(String id) async {
     try {
-      final response = await ApiClient.get('/api/submissions/$id');
+      final response = await ApiClient.get('/api/v1/submissions/$id');
       return Submission.fromJson(response.data);
-    } catch (e) {
+    } on ApiException {
       return null;
     }
   }
@@ -23,14 +23,14 @@ class SubmissionRepository {
   /// Create submission
   Future<Submission> createSubmission(Submission submission) async {
     final response =
-        await ApiClient.post('/api/submissions', data: submission.toJson());
+        await ApiClient.post('/api/v1/submissions', data: submission.toJson());
     return Submission.fromJson(response.data);
   }
 
   /// Update submission
   Future<Submission> updateSubmission(Submission submission) async {
     final response = await ApiClient.put(
-      '/api/submissions/${submission.id}',
+      '/api/v1/submissions/${submission.id}',
       data: submission.toJson(),
     );
     return Submission.fromJson(response.data);
@@ -38,23 +38,25 @@ class SubmissionRepository {
 
   /// Delete submission
   Future<void> deleteSubmission(String id) async {
-    await ApiClient.delete('/api/submissions/$id');
+    await ApiClient.delete('/api/v1/submissions/$id');
   }
 
   /// Get answers for a submission
   Future<List<SubmissionAnswer>> getSubmissionAnswers(
       String submissionId) async {
     final response =
-        await ApiClient.get('/api/submissions/$submissionId/answers');
+        await ApiClient.get('/api/v1/submissions/$submissionId/answers');
     return (response.data as List)
         .map((json) => SubmissionAnswer.fromJson(json))
         .toList();
   }
 
-  /// Save answer
+  /// Save answer (create or update)
   Future<SubmissionAnswer> saveAnswer(SubmissionAnswer answer) async {
-    final response =
-        await ApiClient.post('/api/answers', data: answer.toJson());
+    final response = await ApiClient.post(
+      '/api/v1/submissions/${answer.submissionId}/answers',
+      data: answer.toJson(),
+    );
     return SubmissionAnswer.fromJson(response.data);
   }
 
@@ -74,8 +76,8 @@ class SubmissionRepository {
   Future<List<Submission>> getSubmissionsByStatus(
       SubmissionStatus status) async {
     final response = await ApiClient.get(
-      '/api/submissions',
-      queryParameters: {'status': status.toString().split('.').last},
+      '/api/v1/submissions',
+      queryParameters: {'status': status.name},
     );
     return (response.data as List)
         .map((json) => Submission.fromJson(json))
@@ -88,10 +90,10 @@ class SubmissionRepository {
     DateTime endDate,
   ) async {
     final response = await ApiClient.get(
-      '/api/submissions',
+      '/api/v1/submissions/date-range',
       queryParameters: {
-        'start_date': startDate.toIso8601String(),
-        'end_date': endDate.toIso8601String(),
+        'start_date': startDate.toIso8601String().split('T')[0],
+        'end_date': endDate.toIso8601String().split('T')[0],
       },
     );
     return (response.data as List)

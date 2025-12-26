@@ -24,7 +24,7 @@ class FormRepository {
   
   /// Get all forms from API
   Future<List<FormModel>> getForms() async {
-    final response = await ApiClient.get('/api/forms');
+    final response = await ApiClient.get('/api/v1/forms');
     return (response.data as List)
         .map((json) => FormModel.fromJson(json))
         .toList();
@@ -33,53 +33,58 @@ class FormRepository {
   /// Get form by ID
   Future<FormModel?> getFormById(String id) async {
     try {
-      final response = await ApiClient.get('/api/forms/$id');
+      final response = await ApiClient.get('/api/v1/forms/$id');
       return FormModel.fromJson(response.data);
-    } catch (e) {
+    } on ApiException {
       return null;
     }
   }
 
   /// Create form
   Future<FormModel> createForm(FormModel form) async {
-    final response = await ApiClient.post('/api/forms', data: form.toJson());
+    final response = await ApiClient.post('/api/v1/forms', data: form.toJson());
     return FormModel.fromJson(response.data);
   }
 
   /// Update form
   Future<FormModel> updateForm(FormModel form) async {
     final response =
-        await ApiClient.put('/api/forms/${form.id}', data: form.toJson());
+        await ApiClient.put('/api/v1/forms/${form.id}', data: form.toJson());
     return FormModel.fromJson(response.data);
   }
 
   /// Delete form
   Future<void> deleteForm(String id) async {
-    await ApiClient.delete('/api/forms/$id');
+    await ApiClient.delete('/api/v1/forms/$id');
   }
 
   /// Get fields for a form
   Future<List<Field>> getFormFields(String formId) async {
-    final response = await ApiClient.get('/api/forms/$formId/fields');
+    final response = await ApiClient.get('/api/v1/forms/$formId/fields');
     return (response.data as List).map((json) => Field.fromJson(json)).toList();
   }
 
   /// Create field
   Future<Field> createField(Field field) async {
-    final response = await ApiClient.post('/api/fields', data: field.toJson());
+    final response = await ApiClient.post(
+      '/api/v1/forms/${field.formId}/fields',
+      data: field.toJson(),
+    );
     return Field.fromJson(response.data);
   }
 
   /// Update field
   Future<Field> updateField(Field field) async {
-    final response =
-        await ApiClient.put('/api/fields/${field.id}', data: field.toJson());
+    final response = await ApiClient.put(
+      '/api/v1/forms/fields/${field.id}',
+      data: field.toJson(),
+    );
     return Field.fromJson(response.data);
   }
 
   /// Delete field
   Future<void> deleteField(String id) async {
-    await ApiClient.delete('/api/fields/$id');
+    await ApiClient.delete('/api/v1/forms/fields/$id');
   }
 
   /// Get field templates
