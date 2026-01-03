@@ -28,6 +28,7 @@ mixin _$Submission {
   SubmissionStatus get status => throw _privateConstructorUsedError;
   double get completionPercentage => throw _privateConstructorUsedError;
   bool get isAutoSubmitted => throw _privateConstructorUsedError;
+  List<SubmissionAnswer> get answers => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
@@ -56,6 +57,7 @@ abstract class $SubmissionCopyWith<$Res> {
       SubmissionStatus status,
       double completionPercentage,
       bool isAutoSubmitted,
+      List<SubmissionAnswer> answers,
       DateTime createdAt,
       DateTime updatedAt});
 }
@@ -83,6 +85,7 @@ class _$SubmissionCopyWithImpl<$Res, $Val extends Submission>
     Object? status = null,
     Object? completionPercentage = null,
     Object? isAutoSubmitted = null,
+    Object? answers = null,
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
@@ -119,6 +122,10 @@ class _$SubmissionCopyWithImpl<$Res, $Val extends Submission>
           ? _value.isAutoSubmitted
           : isAutoSubmitted // ignore: cast_nullable_to_non_nullable
               as bool,
+      answers: null == answers
+          ? _value.answers
+          : answers // ignore: cast_nullable_to_non_nullable
+              as List<SubmissionAnswer>,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -148,6 +155,7 @@ abstract class _$$SubmissionImplCopyWith<$Res>
       SubmissionStatus status,
       double completionPercentage,
       bool isAutoSubmitted,
+      List<SubmissionAnswer> answers,
       DateTime createdAt,
       DateTime updatedAt});
 }
@@ -173,6 +181,7 @@ class __$$SubmissionImplCopyWithImpl<$Res>
     Object? status = null,
     Object? completionPercentage = null,
     Object? isAutoSubmitted = null,
+    Object? answers = null,
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
@@ -209,6 +218,10 @@ class __$$SubmissionImplCopyWithImpl<$Res>
           ? _value.isAutoSubmitted
           : isAutoSubmitted // ignore: cast_nullable_to_non_nullable
               as bool,
+      answers: null == answers
+          ? _value._answers
+          : answers // ignore: cast_nullable_to_non_nullable
+              as List<SubmissionAnswer>,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -233,8 +246,10 @@ class _$SubmissionImpl implements _Submission {
       this.status = SubmissionStatus.inProgress,
       this.completionPercentage = 0.0,
       this.isAutoSubmitted = false,
+      final List<SubmissionAnswer> answers = const [],
       required this.createdAt,
-      required this.updatedAt});
+      required this.updatedAt})
+      : _answers = answers;
 
   factory _$SubmissionImpl.fromJson(Map<String, dynamic> json) =>
       _$$SubmissionImplFromJson(json);
@@ -258,6 +273,15 @@ class _$SubmissionImpl implements _Submission {
   @override
   @JsonKey()
   final bool isAutoSubmitted;
+  final List<SubmissionAnswer> _answers;
+  @override
+  @JsonKey()
+  List<SubmissionAnswer> get answers {
+    if (_answers is EqualUnmodifiableListView) return _answers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_answers);
+  }
+
   @override
   final DateTime createdAt;
   @override
@@ -265,7 +289,7 @@ class _$SubmissionImpl implements _Submission {
 
   @override
   String toString() {
-    return 'Submission(id: $id, formId: $formId, submittedBy: $submittedBy, submissionDate: $submissionDate, submissionTime: $submissionTime, status: $status, completionPercentage: $completionPercentage, isAutoSubmitted: $isAutoSubmitted, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Submission(id: $id, formId: $formId, submittedBy: $submittedBy, submissionDate: $submissionDate, submissionTime: $submissionTime, status: $status, completionPercentage: $completionPercentage, isAutoSubmitted: $isAutoSubmitted, answers: $answers, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -286,6 +310,7 @@ class _$SubmissionImpl implements _Submission {
                 other.completionPercentage == completionPercentage) &&
             (identical(other.isAutoSubmitted, isAutoSubmitted) ||
                 other.isAutoSubmitted == isAutoSubmitted) &&
+            const DeepCollectionEquality().equals(other._answers, _answers) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -304,6 +329,7 @@ class _$SubmissionImpl implements _Submission {
       status,
       completionPercentage,
       isAutoSubmitted,
+      const DeepCollectionEquality().hash(_answers),
       createdAt,
       updatedAt);
 
@@ -333,6 +359,7 @@ abstract class _Submission implements Submission {
       final SubmissionStatus status,
       final double completionPercentage,
       final bool isAutoSubmitted,
+      final List<SubmissionAnswer> answers,
       required final DateTime createdAt,
       required final DateTime updatedAt}) = _$SubmissionImpl;
 
@@ -356,6 +383,8 @@ abstract class _Submission implements Submission {
   @override
   bool get isAutoSubmitted;
   @override
+  List<SubmissionAnswer> get answers;
+  @override
   DateTime get createdAt;
   @override
   DateTime get updatedAt;
@@ -377,7 +406,9 @@ mixin _$SubmissionAnswer {
   String get id => throw _privateConstructorUsedError;
   String get submissionId => throw _privateConstructorUsedError;
   String get fieldId => throw _privateConstructorUsedError;
+  String get fieldLabel => throw _privateConstructorUsedError;
   String? get answerValue => throw _privateConstructorUsedError;
+  String? get value => throw _privateConstructorUsedError;
   String? get fileUrl => throw _privateConstructorUsedError;
   DateTime get answeredAt => throw _privateConstructorUsedError;
 
@@ -401,7 +432,9 @@ abstract class $SubmissionAnswerCopyWith<$Res> {
       {String id,
       String submissionId,
       String fieldId,
+      String fieldLabel,
       String? answerValue,
+      String? value,
       String? fileUrl,
       DateTime answeredAt});
 }
@@ -424,7 +457,9 @@ class _$SubmissionAnswerCopyWithImpl<$Res, $Val extends SubmissionAnswer>
     Object? id = null,
     Object? submissionId = null,
     Object? fieldId = null,
+    Object? fieldLabel = null,
     Object? answerValue = freezed,
+    Object? value = freezed,
     Object? fileUrl = freezed,
     Object? answeredAt = null,
   }) {
@@ -441,9 +476,17 @@ class _$SubmissionAnswerCopyWithImpl<$Res, $Val extends SubmissionAnswer>
           ? _value.fieldId
           : fieldId // ignore: cast_nullable_to_non_nullable
               as String,
+      fieldLabel: null == fieldLabel
+          ? _value.fieldLabel
+          : fieldLabel // ignore: cast_nullable_to_non_nullable
+              as String,
       answerValue: freezed == answerValue
           ? _value.answerValue
           : answerValue // ignore: cast_nullable_to_non_nullable
+              as String?,
+      value: freezed == value
+          ? _value.value
+          : value // ignore: cast_nullable_to_non_nullable
               as String?,
       fileUrl: freezed == fileUrl
           ? _value.fileUrl
@@ -469,7 +512,9 @@ abstract class _$$SubmissionAnswerImplCopyWith<$Res>
       {String id,
       String submissionId,
       String fieldId,
+      String fieldLabel,
       String? answerValue,
+      String? value,
       String? fileUrl,
       DateTime answeredAt});
 }
@@ -490,7 +535,9 @@ class __$$SubmissionAnswerImplCopyWithImpl<$Res>
     Object? id = null,
     Object? submissionId = null,
     Object? fieldId = null,
+    Object? fieldLabel = null,
     Object? answerValue = freezed,
+    Object? value = freezed,
     Object? fileUrl = freezed,
     Object? answeredAt = null,
   }) {
@@ -507,9 +554,17 @@ class __$$SubmissionAnswerImplCopyWithImpl<$Res>
           ? _value.fieldId
           : fieldId // ignore: cast_nullable_to_non_nullable
               as String,
+      fieldLabel: null == fieldLabel
+          ? _value.fieldLabel
+          : fieldLabel // ignore: cast_nullable_to_non_nullable
+              as String,
       answerValue: freezed == answerValue
           ? _value.answerValue
           : answerValue // ignore: cast_nullable_to_non_nullable
+              as String?,
+      value: freezed == value
+          ? _value.value
+          : value // ignore: cast_nullable_to_non_nullable
               as String?,
       fileUrl: freezed == fileUrl
           ? _value.fileUrl
@@ -530,7 +585,9 @@ class _$SubmissionAnswerImpl implements _SubmissionAnswer {
       {required this.id,
       required this.submissionId,
       required this.fieldId,
+      required this.fieldLabel,
       this.answerValue,
+      this.value,
       this.fileUrl,
       required this.answeredAt});
 
@@ -544,7 +601,11 @@ class _$SubmissionAnswerImpl implements _SubmissionAnswer {
   @override
   final String fieldId;
   @override
+  final String fieldLabel;
+  @override
   final String? answerValue;
+  @override
+  final String? value;
   @override
   final String? fileUrl;
   @override
@@ -552,7 +613,7 @@ class _$SubmissionAnswerImpl implements _SubmissionAnswer {
 
   @override
   String toString() {
-    return 'SubmissionAnswer(id: $id, submissionId: $submissionId, fieldId: $fieldId, answerValue: $answerValue, fileUrl: $fileUrl, answeredAt: $answeredAt)';
+    return 'SubmissionAnswer(id: $id, submissionId: $submissionId, fieldId: $fieldId, fieldLabel: $fieldLabel, answerValue: $answerValue, value: $value, fileUrl: $fileUrl, answeredAt: $answeredAt)';
   }
 
   @override
@@ -564,8 +625,11 @@ class _$SubmissionAnswerImpl implements _SubmissionAnswer {
             (identical(other.submissionId, submissionId) ||
                 other.submissionId == submissionId) &&
             (identical(other.fieldId, fieldId) || other.fieldId == fieldId) &&
+            (identical(other.fieldLabel, fieldLabel) ||
+                other.fieldLabel == fieldLabel) &&
             (identical(other.answerValue, answerValue) ||
                 other.answerValue == answerValue) &&
+            (identical(other.value, value) || other.value == value) &&
             (identical(other.fileUrl, fileUrl) || other.fileUrl == fileUrl) &&
             (identical(other.answeredAt, answeredAt) ||
                 other.answeredAt == answeredAt));
@@ -573,8 +637,8 @@ class _$SubmissionAnswerImpl implements _SubmissionAnswer {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, submissionId, fieldId, answerValue, fileUrl, answeredAt);
+  int get hashCode => Object.hash(runtimeType, id, submissionId, fieldId,
+      fieldLabel, answerValue, value, fileUrl, answeredAt);
 
   /// Create a copy of SubmissionAnswer
   /// with the given fields replaced by the non-null parameter values.
@@ -598,7 +662,9 @@ abstract class _SubmissionAnswer implements SubmissionAnswer {
       {required final String id,
       required final String submissionId,
       required final String fieldId,
+      required final String fieldLabel,
       final String? answerValue,
+      final String? value,
       final String? fileUrl,
       required final DateTime answeredAt}) = _$SubmissionAnswerImpl;
 
@@ -612,7 +678,11 @@ abstract class _SubmissionAnswer implements SubmissionAnswer {
   @override
   String get fieldId;
   @override
+  String get fieldLabel;
+  @override
   String? get answerValue;
+  @override
+  String? get value;
   @override
   String? get fileUrl;
   @override

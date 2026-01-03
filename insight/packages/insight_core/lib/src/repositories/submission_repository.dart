@@ -1,9 +1,16 @@
 import '../models/submission.dart';
 import '../services/api_client.dart';
+import 'auth_repository.dart';
 
 class SubmissionRepository {
   /// Get all submissions for a form
   Future<List<Submission>> getFormSubmissions(String formId) async {
+    if (AuthRepository.testMode) {
+      print('Test mode: Returning empty submissions list for form $formId');
+      await Future.delayed(const Duration(milliseconds: 100));
+      return [];
+    }
+    
     final response = await ApiClient.get('/api/v1/submissions/form/$formId');
     return (response.data as List)
         .map((json) => Submission.fromJson(json))

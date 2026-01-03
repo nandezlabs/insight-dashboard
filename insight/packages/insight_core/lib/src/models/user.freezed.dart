@@ -21,8 +21,10 @@ User _$UserFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$User {
   String get id => throw _privateConstructorUsedError;
-  String get email => throw _privateConstructorUsedError;
+  String get username =>
+      throw _privateConstructorUsedError; // Store code (e.g., "PX0000")
   String get fullName => throw _privateConstructorUsedError;
+  String? get email => throw _privateConstructorUsedError; // Optional
   bool get isActive => throw _privateConstructorUsedError;
   bool get isSuperuser => throw _privateConstructorUsedError;
   String? get teamMemberId => throw _privateConstructorUsedError;
@@ -44,8 +46,9 @@ abstract class $UserCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      String email,
+      String username,
       String fullName,
+      String? email,
       bool isActive,
       bool isSuperuser,
       String? teamMemberId,
@@ -68,8 +71,9 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
   @override
   $Res call({
     Object? id = null,
-    Object? email = null,
+    Object? username = null,
     Object? fullName = null,
+    Object? email = freezed,
     Object? isActive = null,
     Object? isSuperuser = null,
     Object? teamMemberId = freezed,
@@ -80,14 +84,18 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      email: null == email
-          ? _value.email
-          : email // ignore: cast_nullable_to_non_nullable
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
               as String,
       fullName: null == fullName
           ? _value.fullName
           : fullName // ignore: cast_nullable_to_non_nullable
               as String,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
       isActive: null == isActive
           ? _value.isActive
           : isActive // ignore: cast_nullable_to_non_nullable
@@ -117,8 +125,9 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      String email,
+      String username,
       String fullName,
+      String? email,
       bool isActive,
       bool isSuperuser,
       String? teamMemberId,
@@ -138,8 +147,9 @@ class __$$UserImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? email = null,
+    Object? username = null,
     Object? fullName = null,
+    Object? email = freezed,
     Object? isActive = null,
     Object? isSuperuser = null,
     Object? teamMemberId = freezed,
@@ -150,14 +160,18 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      email: null == email
-          ? _value.email
-          : email // ignore: cast_nullable_to_non_nullable
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
               as String,
       fullName: null == fullName
           ? _value.fullName
           : fullName // ignore: cast_nullable_to_non_nullable
               as String,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
       isActive: null == isActive
           ? _value.isActive
           : isActive // ignore: cast_nullable_to_non_nullable
@@ -183,8 +197,9 @@ class __$$UserImplCopyWithImpl<$Res>
 class _$UserImpl implements _User {
   const _$UserImpl(
       {required this.id,
-      required this.email,
+      required this.username,
       required this.fullName,
+      this.email,
       this.isActive = true,
       this.isSuperuser = false,
       this.teamMemberId,
@@ -196,9 +211,13 @@ class _$UserImpl implements _User {
   @override
   final String id;
   @override
-  final String email;
+  final String username;
+// Store code (e.g., "PX0000")
   @override
   final String fullName;
+  @override
+  final String? email;
+// Optional
   @override
   @JsonKey()
   final bool isActive;
@@ -212,7 +231,7 @@ class _$UserImpl implements _User {
 
   @override
   String toString() {
-    return 'User(id: $id, email: $email, fullName: $fullName, isActive: $isActive, isSuperuser: $isSuperuser, teamMemberId: $teamMemberId, createdAt: $createdAt)';
+    return 'User(id: $id, username: $username, fullName: $fullName, email: $email, isActive: $isActive, isSuperuser: $isSuperuser, teamMemberId: $teamMemberId, createdAt: $createdAt)';
   }
 
   @override
@@ -221,9 +240,11 @@ class _$UserImpl implements _User {
         (other.runtimeType == runtimeType &&
             other is _$UserImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.email, email) || other.email == email) &&
+            (identical(other.username, username) ||
+                other.username == username) &&
             (identical(other.fullName, fullName) ||
                 other.fullName == fullName) &&
+            (identical(other.email, email) || other.email == email) &&
             (identical(other.isActive, isActive) ||
                 other.isActive == isActive) &&
             (identical(other.isSuperuser, isSuperuser) ||
@@ -236,8 +257,8 @@ class _$UserImpl implements _User {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, email, fullName, isActive,
-      isSuperuser, teamMemberId, createdAt);
+  int get hashCode => Object.hash(runtimeType, id, username, fullName, email,
+      isActive, isSuperuser, teamMemberId, createdAt);
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -258,8 +279,9 @@ class _$UserImpl implements _User {
 abstract class _User implements User {
   const factory _User(
       {required final String id,
-      required final String email,
+      required final String username,
       required final String fullName,
+      final String? email,
       final bool isActive,
       final bool isSuperuser,
       final String? teamMemberId,
@@ -270,9 +292,11 @@ abstract class _User implements User {
   @override
   String get id;
   @override
-  String get email;
+  String get username; // Store code (e.g., "PX0000")
   @override
   String get fullName;
+  @override
+  String? get email; // Optional
   @override
   bool get isActive;
   @override

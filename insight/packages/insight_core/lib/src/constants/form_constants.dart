@@ -35,4 +35,9 @@ class FormConstants {
   // Submission
   static const int autoSaveDebounceMs = 500;
   static const Duration submissionTimeout = Duration(minutes: 30);
+
+  // Standard field labels for common use cases
+  static const String completedByLabel = 'Completed by';
+  static const String completedByHint = 'Enter your name';
+  static const String completedByDescription = 'Name of the employee completing this section';
 }

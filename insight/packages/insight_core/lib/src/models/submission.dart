@@ -23,6 +23,7 @@ class Submission with _$Submission {
     @Default(SubmissionStatus.inProgress) SubmissionStatus status,
     @Default(0.0) double completionPercentage,
     @Default(false) bool isAutoSubmitted,
+    @Default([]) List<SubmissionAnswer> answers,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _Submission;
@@ -37,7 +38,9 @@ class SubmissionAnswer with _$SubmissionAnswer {
     required String id,
     required String submissionId,
     required String fieldId,
+    required String fieldLabel,
     String? answerValue,
+    String? value,
     String? fileUrl,
     required DateTime answeredAt,
   }) = _SubmissionAnswer;

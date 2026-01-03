@@ -7,8 +7,9 @@ part 'user.g.dart';
 class User with _$User {
   const factory User({
     required String id,
-    required String email,
+    required String username,  // Store code (e.g., "PX0000")
     required String fullName,
+    String? email,  // Optional
     @Default(true) bool isActive,
     @Default(false) bool isSuperuser,
     String? teamMemberId,

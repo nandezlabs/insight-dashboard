@@ -18,6 +18,10 @@ _$SubmissionImpl _$$SubmissionImplFromJson(Map<String, dynamic> json) =>
       completionPercentage:
           (json['completionPercentage'] as num?)?.toDouble() ?? 0.0,
       isAutoSubmitted: json['isAutoSubmitted'] as bool? ?? false,
+      answers: (json['answers'] as List<dynamic>?)
+              ?.map((e) => SubmissionAnswer.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -32,6 +36,7 @@ Map<String, dynamic> _$$SubmissionImplToJson(_$SubmissionImpl instance) =>
       'status': _$SubmissionStatusEnumMap[instance.status]!,
       'completionPercentage': instance.completionPercentage,
       'isAutoSubmitted': instance.isAutoSubmitted,
+      'answers': instance.answers,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
     };
@@ -48,7 +53,9 @@ _$SubmissionAnswerImpl _$$SubmissionAnswerImplFromJson(
       id: json['id'] as String,
       submissionId: json['submissionId'] as String,
       fieldId: json['fieldId'] as String,
+      fieldLabel: json['fieldLabel'] as String,
       answerValue: json['answerValue'] as String?,
+      value: json['value'] as String?,
       fileUrl: json['fileUrl'] as String?,
       answeredAt: DateTime.parse(json['answeredAt'] as String),
     );
@@ -59,7 +66,9 @@ Map<String, dynamic> _$$SubmissionAnswerImplToJson(
       'id': instance.id,
       'submissionId': instance.submissionId,
       'fieldId': instance.fieldId,
+      'fieldLabel': instance.fieldLabel,
       'answerValue': instance.answerValue,
+      'value': instance.value,
       'fileUrl': instance.fileUrl,
       'answeredAt': instance.answeredAt.toIso8601String(),
     };

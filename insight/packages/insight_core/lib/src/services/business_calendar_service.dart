@@ -11,8 +11,11 @@ class BusinessCalendarService {
     // 28 days (4 weeks) in a period
     final period = ((daysSinceStart ~/ 28) % 13) + 1; // 1-13
 
-    // 3 periods in a quarter
-    final quarter = ((period - 1) ~/ 3) + 1; // 1-4
+    // Quarters: Q1 = P1-P3, Q2 = P4-P6, Q3 = P7-P9, Q4 = P10-P13
+    // Q4 has 4 periods instead of 3
+    final quarter = period <= 3 ? 1 : 
+                   period <= 6 ? 2 : 
+                   period <= 9 ? 3 : 4;
 
     return BusinessPeriod(
       week: week,

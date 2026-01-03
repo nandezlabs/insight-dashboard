@@ -7,13 +7,45 @@ class AuthRepository {
   static const _storage = FlutterSecureStorage();
   static const _tokenKey = 'auth_token';
   static const _userKey = 'auth_user';
+  
+  // Test mode - set to true to bypass backend and auto-login
+  static const bool testMode = true;
+  
+  // Mock user for testing
+  static final _testUser = User(
+    id: 'test-user-id',
+    username: 'PX0000',
+    fullName: 'Test Manager',
+    email: 'test@example.com',
+    isActive: true,
+    isSuperuser: false,
+    createdAt: DateTime.now(),
+  );
+  
+  static final _testAuthToken = AuthToken(
+    accessToken: 'test-token-12345',
+    tokenType: 'bearer',
+    user: _testUser,
+  );
 
-  /// Login with email and password
-  Future<AuthToken> login(String email, String password) async {
+  /// Login with store code and password
+  Future<AuthToken> login(String storeCode, String password) async {
+    if (testMode) {
+      // Test mode: return mock auth token without storage
+      print('Test mode: Logging in with store code $storeCode');
+      await Future.delayed(const Duration(milliseconds: 500)); // Simulate network delay
+      // Don't store in test mode to avoid issues
+      // await _storage.write(key: _tokenKey, value: _testAuthToken.accessToken);
+      // await _storage.write(key: _userKey, value: jsonEncode(_testAuthToken.user.toJson()));
+      // ApiClient.setAuthToken(_testAuthToken.accessToken);
+      print('Test mode: Login successful');
+      return _testAuthToken;
+    }
+    
     final response = await ApiClient.post(
       '/api/v1/auth/login/json',
       data: {
-        'email': email,
+        'username': storeCode.toUpperCase(),
         'password': password,
       },
     );
@@ -30,18 +62,34 @@ class AuthRepository {
     return authToken;
   }
 
-  /// Sign up with email, password, and full name
-  Future<User> signup(String email, String password, String fullName) async {
+  /// Create account for first-time login (store code + password)
+  Future<AuthToken> createAccount(String storeCode, String password) async {
+    if (testMode) {
+      // Test mode: return mock auth token without storage
+      print('Test mode: Creating account for store code $storeCode');
+      await Future.delayed(const Duration(milliseconds: 500)); // Simulate network delay
+      print('Test mode: Account created successfully');
+      return _testAuthToken;
+    }
+    
     final response = await ApiClient.post(
-      '/api/v1/auth/signup',
+      '/api/v1/auth/create-account',
       data: {
-        'email': email,
+        'username': storeCode.toUpperCase(),
         'password': password,
-        'full_name': fullName,
       },
     );
 
-    return User.fromJson(response.data);
+    final authToken = AuthToken.fromJson(response.data);
+    
+    // Store token and user
+    await _storage.write(key: _tokenKey, value: authToken.accessToken);
+    await _storage.write(key: _userKey, value: jsonEncode(authToken.user.toJson()));
+    
+    // Set token in API client
+    ApiClient.setAuthToken(authToken.accessToken);
+    
+    return authToken;
   }
 
   /// Get current user from API
