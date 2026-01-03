@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:insight_core/insight_core.dart';
 import 'package:insight_ui/insight_ui.dart';
+import 'package:file_picker/file_picker.dart';
+import '../../core/providers/app_providers.dart';
 
 /// Base widget for rendering form fields based on field type
 class FormFieldWidget extends StatelessWidget {
@@ -423,6 +427,7 @@ class _TimeFieldWidgetState extends State<TimeFieldWidget> {
         final time = await showTimePicker(
           context: context,
           initialTime: widget.value ?? TimeOfDay.now(),
+          initialEntryMode: TimePickerEntryMode.input,
         );
         if (time != null) {
           widget.onChanged(time);
@@ -585,7 +590,7 @@ class CheckboxFieldWidget extends StatelessWidget {
 }
 
 // File Field
-class FileFieldWidget extends StatelessWidget {
+class FileFieldWidget extends ConsumerStatefulWidget {
   final Field field;
   final dynamic value;
   final Function(dynamic) onChanged;
@@ -598,42 +603,214 @@ class FileFieldWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        // TODO: Implement file picker
+  ConsumerState<FileFieldWidget> createState() => _FileFieldWidgetState();
+}
+
+class _FileFieldWidgetState extends ConsumerState<FileFieldWidget> {
+  List<Map<String, dynamic>> _uploadedFiles = [];
+  bool _isUploading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExistingFiles();
+  }
+
+  void _loadExistingFiles() {
+    if (widget.value is List) {
+      // Load existing file URLs/metadata
+      setState(() {
+        _uploadedFiles = (widget.value as List).map((item) {
+          if (item is Map<String, dynamic>) {
+            return item;
+          } else if (item is String) {
+            // Legacy format: just file URLs
+            return {'url': item, 'filename': item.split('/').last};
+          }
+          return <String, dynamic>{};
+        }).toList();
+      });
+    }
+  }
+
+  Future<void> _pickAndUploadFiles() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx', 'xls', 'xlsx'],
+      );
+
+      if (result == null || result.files.isEmpty) return;
+
+      setState(() => _isUploading = true);
+
+      final fileRepository = ref.read(fileRepositoryProvider);
+      final filesToUpload = result.files
+          .where((f) => f.path != null)
+          .map((f) => File(f.path!))
+          .toList();
+
+      if (filesToUpload.isEmpty) {
+        setState(() => _isUploading = false);
+        return;
+      }
+
+      // Upload files to backend
+      final response = await fileRepository.uploadFiles(filesToUpload);
+      
+      if (response['success'] == true && response['files'] is List) {
+        final newFiles = (response['files'] as List).cast<Map<String, dynamic>>();
+        setState(() {
+          _uploadedFiles.addAll(newFiles);
+          _isUploading = false;
+        });
+        
+        // Store file metadata
+        widget.onChanged(_uploadedFiles);
+      } else {
+        throw Exception('Upload failed');
+      }
+    } catch (e) {
+      setState(() => _isUploading = false);
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File picker coming soon')),
+          SnackBar(content: Text('Error uploading files: $e')),
         );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(8),
+      }
+    }
+  }
+
+  Future<void> _removeFile(int index) async {
+    final file = _uploadedFiles[index];
+    
+    try {
+      // Delete from backend if it has a stored_filename
+      if (file['stored_filename'] != null) {
+        final fileRepository = ref.read(fileRepositoryProvider);
+        await fileRepository.deleteFile(file['stored_filename']);
+      }
+      
+      setState(() {
+        _uploadedFiles.removeAt(index);
+      });
+      
+      widget.onChanged(_uploadedFiles.isEmpty ? null : _uploadedFiles);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting file: $e')),
+        );
+      }
+    }
+  }
+
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  Widget _buildFilePreview(Map<String, dynamic> file, int index) {
+    final filename = file['filename'] ?? 'Unknown';
+    final extension = file['extension'] ?? '';
+    final size = file['size'] ?? 0;
+    final fileType = file['type'] ?? 'unknown';
+    final isImage = fileType == 'image';
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: isImage
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Icon(_getFileIcon(extension), size: 40),
+                // TODO: Load actual image from URL when backend supports it
+              )
+            : Icon(_getFileIcon(extension), size: 40),
+        title: Text(
+          filename,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        child: Row(
-          children: [
-            const Icon(Icons.cloud_upload_outlined),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                value != null
-                    ? 'File uploaded'
-                    : field.placeholder ?? 'Tap to upload file',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: value != null ? AppColors.textPrimary : AppColors.textSecondary,
-                ),
-              ),
-            ),
-            if (value != null)
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => onChanged(null),
-              ),
-          ],
+        subtitle: Text(_formatFileSize(size)),
+        trailing: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => _removeFile(index),
         ),
       ),
+    );
+  }
+
+  IconData _getFileIcon(String? extension) {
+    switch (extension?.toLowerCase()) {
+      case 'pdf':
+        return Icons.picture_as_pdf;
+      case 'doc':
+      case 'docx':
+        return Icons.description;
+      case 'xls':
+      case 'xlsx':
+        return Icons.table_chart;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return Icons.image;
+      default:
+        return Icons.insert_drive_file;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: _isUploading ? null : _pickAndUploadFiles,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: _isUploading ? AppColors.textSecondary : AppColors.border,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  _isUploading ? Icons.hourglass_empty : Icons.cloud_upload_outlined,
+                  color: _isUploading ? AppColors.textSecondary : AppColors.primary,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _isUploading
+                        ? 'Uploading...'
+                        : widget.field.placeholder ?? 'Tap to upload files',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: _isUploading ? AppColors.textSecondary : AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.attach_file),
+              ],
+            ),
+          ),
+        ),
+        if (_uploadedFiles.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text(
+            '${_uploadedFiles.length} file(s) uploaded',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ..._uploadedFiles.asMap().entries.map((entry) => _buildFilePreview(entry.value, entry.key)),
+        ],
+      ],
     );
   }
 }

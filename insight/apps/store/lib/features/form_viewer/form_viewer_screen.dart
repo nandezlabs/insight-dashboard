@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:insight_core/insight_core.dart';
 import 'package:insight_ui/insight_ui.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/providers/auth_provider.dart';
 import 'form_field_widgets.dart';
 
 class FormViewerScreen extends ConsumerStatefulWidget {
@@ -177,10 +178,13 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
         await repository.updateSubmission(submission);
       } else {
         // Create new in-progress submission
+        final authState = ref.read(authProvider);
+        final storeCode = authState.user?.username ?? 'unknown';
+        
         submission = Submission(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           formId: widget.formId,
-          submittedBy: 'current_user_id', // TODO: Get from auth
+          submittedBy: storeCode,
           submissionDate: DateTime.now(),
           submissionTime: DateTime.now(),
           status: SubmissionStatus.inProgress,
@@ -194,11 +198,14 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
       for (final field in _fields) {
         final value = _answers[field.id];
         if (value != null) {
+          final serialized = _serializeValue(value);
           final answer = SubmissionAnswer(
             id: '${submission.id}_${field.id}',
             submissionId: submission.id,
             fieldId: field.id,
-            answerValue: _serializeValue(value),
+            fieldLabel: field.label,
+            answerValue: serialized,
+            value: serialized,
             answeredAt: DateTime.now(),
           );
           
@@ -243,7 +250,7 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please fix the errors before submitting'),
+            content: Text('Please ensure all questions are answered'),
             backgroundColor: Colors.red,
           ),
         );
@@ -259,10 +266,13 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
       
       // Create submission
       final now = DateTime.now();
+      final authState = ref.read(authProvider);
+      final storeCode = authState.user?.username ?? 'unknown';
+      
       final submission = Submission(
         id: now.millisecondsSinceEpoch.toString(),
         formId: widget.formId,
-        submittedBy: 'current_user_id', // TODO: Get from auth
+        submittedBy: storeCode,
         submissionDate: now,
         submissionTime: now,
         status: SubmissionStatus.completed,
@@ -278,11 +288,14 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
       for (final field in _fields) {
         final value = _answers[field.id];
         if (value != null) {
+          final serialized = _serializeValue(value);
           final answer = SubmissionAnswer(
             id: '${submission.id}_${field.id}',
             submissionId: submission.id,
             fieldId: field.id,
-            answerValue: _serializeValue(value),
+            fieldLabel: field.label,
+            answerValue: serialized,
+            value: serialized,
             answeredAt: now,
           );
           
@@ -291,17 +304,56 @@ class _FormViewerScreenState extends ConsumerState<FormViewerScreen> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Form submitted successfully!'),
-            backgroundColor: Colors.green,
+        // Show success dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 48,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Form Submitted!',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Your response has been recorded successfully.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
         
-        // Navigate back after a brief delay
-        await Future.delayed(const Duration(milliseconds: 500));
+        // Auto-dismiss and navigate back after 3 seconds
+        await Future.delayed(const Duration(seconds: 3));
         if (mounted) {
-          context.pop();
+          Navigator.of(context).pop(); // Close dialog
+          context.pop(); // Navigate back to previous screen
         }
       }
     } catch (e) {

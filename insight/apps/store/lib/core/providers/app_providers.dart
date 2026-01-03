@@ -76,10 +76,27 @@ final teamRepositoryProvider = Provider<TeamRepository>((ref) {
   return TeamRepository();
 });
 
+final fileRepositoryProvider = Provider<FileRepository>((ref) {
+  return FileRepository();
+});
+
 // Forms List Provider
 final formsProvider = FutureProvider<List<FormModel>>((ref) async {
   final repository = ref.watch(formRepositoryProvider);
   return await repository.getAllForms();
+});
+
+final activeFormsProvider = FutureProvider<List<FormModel>>((ref) async {
+  final repository = ref.watch(formRepositoryProvider);
+  final allForms = await repository.getAllForms();
+  return allForms.where((f) => f.status == FormStatus.active).toList();
+});
+
+// Submissions Provider - user's submissions
+final mySubmissionsProvider = FutureProvider<List<Submission>>((ref) async {
+  // In real app, would filter by current user
+  // For now, return empty list (needs backend endpoint)
+  return [];
 });
 
 // Team Members Provider
