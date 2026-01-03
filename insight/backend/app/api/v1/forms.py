@@ -94,7 +94,7 @@ async def list_form_fields(
     form = db.query(Form).filter(Form.id == form_id).first()
     if not form:
         raise HTTPException(status_code=404, detail="Form not found")
-    
+
     return db.query(Field).filter(Field.form_id == form_id).order_by(Field.order).all()
 
 
@@ -108,7 +108,7 @@ async def create_field(
     form = db.query(Form).filter(Form.id == form_id).first()
     if not form:
         raise HTTPException(status_code=404, detail="Form not found")
-    
+
     db_field = Field(form_id=form_id, **field.model_dump())
     db.add(db_field)
     db.commit()

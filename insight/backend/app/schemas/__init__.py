@@ -13,6 +13,19 @@ class BaseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# Goal and KPI schemas
+from app.schemas.goal import (
+    GoalType,
+    GoalBase,
+    GoalCreate,
+    GoalUpdate,
+    Goal,
+    KpiDataBase,
+    KpiDataCreate,
+    KpiData,
+)
+
+
 # Team schemas
 class TeamMemberBase(BaseSchema):
     """Team member base schema."""
@@ -244,7 +257,6 @@ class SyncPullRequest(BaseSchema):
     device_id: str
     last_sync_timestamp: Optional[datetime] = None
     tables: list[str]  # List of table names to sync
-
 
 
 class SyncPushRequest(BaseSchema):

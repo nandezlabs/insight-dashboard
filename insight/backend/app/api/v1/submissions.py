@@ -1,6 +1,6 @@
 """Submission endpoints."""
 
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from datetime import datetime
 
@@ -25,15 +25,15 @@ router = APIRouter(prefix="/submissions", tags=["submissions"])
 async def list_submissions(
     skip: int = 0,
     limit: int = 100,
-    status: SubmissionStatus | None = None,
+    status: Optional[SubmissionStatus] = None,
     db: Session = Depends(get_database),
 ):
     """Get all submissions."""
     query = db.query(Submission)
-    
+
     if status:
         query = query.filter(Submission.status == status)
-    
+
     return query.offset(skip).limit(limit).all()
 
 
@@ -49,15 +49,15 @@ async def get_submission(submission_id: UUID, db: Session = Depends(get_database
 @router.get("/form/{form_id}", response_model=List[SubmissionResponse])
 async def list_form_submissions(
     form_id: UUID,
-    status: SubmissionStatus | None = None,
+    status: Optional[SubmissionStatus] = None,
     db: Session = Depends(get_database),
 ):
     """Get all submissions for a specific form."""
     query = db.query(Submission).filter(Submission.form_id == form_id)
-    
+
     if status:
         query = query.filter(Submission.status == status)
-    
+
     return query.all()
 
 
@@ -72,12 +72,15 @@ async def list_submissions_by_date_range(
         start = datetime.fromisoformat(start_date).date()
         end = datetime.fromisoformat(end_date).date()
     except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid date format. Use ISO format (YYYY-MM-DD)")
-    
-    return db.query(Submission).filter(
-        Submission.submission_date >= start,
-        Submission.submission_date <= end
-    ).all()
+        raise HTTPException(
+            status_code=400, detail="Invalid date format. Use ISO format (YYYY-MM-DD)"
+        )
+
+    return (
+        db.query(Submission)
+        .filter(Submission.submission_date >= start, Submission.submission_date <= end)
+        .all()
+    )
 
 
 @router.post("/", response_model=SubmissionResponse)
@@ -135,10 +138,12 @@ async def list_submission_answers(
     submission = db.query(Submission).filter(Submission.id == submission_id).first()
     if not submission:
         raise HTTPException(status_code=404, detail="Submission not found")
-    
-    return db.query(SubmissionAnswer).filter(
-        SubmissionAnswer.submission_id == submission_id
-    ).all()
+
+    return (
+        db.query(SubmissionAnswer)
+        .filter(SubmissionAnswer.submission_id == submission_id)
+        .all()
+    )
 
 
 @router.post("/{submission_id}/answers", response_model=SubmissionAnswerResponse)
@@ -151,13 +156,17 @@ async def save_answer(
     submission = db.query(Submission).filter(Submission.id == submission_id).first()
     if not submission:
         raise HTTPException(status_code=404, detail="Submission not found")
-    
+
     # Check if answer already exists
-    existing_answer = db.query(SubmissionAnswer).filter(
-        SubmissionAnswer.submission_id == submission_id,
-        SubmissionAnswer.field_id == answer.field_id
-    ).first()
-    
+    existing_answer = (
+        db.query(SubmissionAnswer)
+        .filter(
+            SubmissionAnswer.submission_id == submission_id,
+            SubmissionAnswer.field_id == answer.field_id,
+        )
+        .first()
+    )
+
     if existing_answer:
         # Update existing answer
         for key, value in answer.model_dump(exclude_unset=True).items():
