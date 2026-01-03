@@ -6,9 +6,9 @@ import '../../features/overview/overview_screen.dart';
 import '../../features/forms/forms_library_screen.dart';
 import '../../features/forms/form_builder_screen.dart';
 import '../../features/analytics/analytics_screen.dart';
+import '../../features/goals/goals_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/auth/login_screen.dart';
-import '../../features/auth/signup_screen.dart';
 import '../providers/auth_provider.dart';
 import 'app_shell.dart';
 
@@ -20,16 +20,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/overview',
     redirect: (context, state) {
       final isAuthenticated = authState.isAuthenticated;
-      final isAuthRoute =
-          state.uri.path == '/login' || state.uri.path == '/signup';
+      final isLoginRoute = state.uri.path == '/login';
 
-      // Redirect to login if not authenticated and not on auth route
-      if (!isAuthenticated && !isAuthRoute) {
+      // Redirect to login if not authenticated and not on login route
+      if (!isAuthenticated && !isLoginRoute) {
         return '/login';
       }
 
-      // Redirect to overview if authenticated and on auth route
-      if (isAuthenticated && isAuthRoute) {
+      // Redirect to overview if authenticated and on login route
+      if (isAuthenticated && isLoginRoute) {
         return '/overview';
       }
 
@@ -41,11 +40,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/signup',
-        name: 'signup',
-        builder: (context, state) => const SignupScreen(),
       ),
 
       // Protected routes (with shell)
@@ -71,6 +65,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: '/analytics',
             name: 'analytics',
             builder: (context, state) => const AnalyticsScreen(),
+          ),
+          GoRoute(
+            path: '/goals',
+            name: 'goals',
+            builder: (context, state) => const GoalsScreen(),
           ),
           GoRoute(
             path: '/settings',

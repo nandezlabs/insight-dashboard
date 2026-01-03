@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:insight_core/insight_core.dart';
 import '../../features/analytics/models/completion_stats.dart';
+import '../../features/analytics/models/kpi_trend_data.dart';
+import '../../features/analytics/services/analytics_service.dart';
 
 // ============================================================================
 // Business Calendar Providers
@@ -93,9 +95,18 @@ final teamMembersProvider = FutureProvider<List<TeamMember>>((ref) async {
 // Goals Providers
 // ============================================================================
 
-// Goals not yet implemented in core package
+final goalRepositoryProvider = Provider<GoalRepository>((ref) {
+  return GoalRepository();
+});
+
 final goalsProvider = FutureProvider<List<Goal>>((ref) async {
-  return <Goal>[]; // Return empty list until GoalRepository is implemented
+  final repository = ref.watch(goalRepositoryProvider);
+  return repository.getGoals();
+});
+
+final kpiDataProvider = FutureProvider<KpiData?>((ref) async {
+  final repository = ref.watch(goalRepositoryProvider);
+  return repository.getLatestKpiData();
 });
 
 // ============================================================================
@@ -156,3 +167,61 @@ final completionStatsProvider = FutureProvider<CompletionStats>((ref) async {
 
 // Alias for backward compatibility
 final formsProvider = formsListProvider;
+
+// ============================================================================
+// Analytics Service Provider
+// ============================================================================
+
+final analyticsServiceProvider = Provider<AnalyticsService>((ref) {
+  final goalRepository = ref.watch(goalRepositoryProvider);
+  return AnalyticsService(goalRepository);
+});
+
+/// Provider for KPI trend data with configurable date range and period type
+final kpiTrendsProvider = FutureProvider.family<List<KpiTrendPoint>, KpiTrendsParams>(
+  (ref, params) async {
+    final service = ref.watch(analyticsServiceProvider);
+    return service.getKpiTrends(
+      startDate: params.startDate,
+      endDate: params.endDate,
+      periodType: params.periodType,
+    );
+  },
+);
+
+/// Provider for period summaries
+final periodSummariesProvider = FutureProvider.family<List<KpiPeriodSummary>, KpiTrendsParams>(
+  (ref, params) async {
+    final service = ref.watch(analyticsServiceProvider);
+    return service.getPeriodSummaries(
+      startDate: params.startDate,
+      endDate: params.endDate,
+      periodType: params.periodType,
+    );
+  },
+);
+
+/// Parameters for KPI trends queries
+class KpiTrendsParams {
+  final DateTime startDate;
+  final DateTime endDate;
+  final AnalyticsPeriodType periodType;
+  
+  const KpiTrendsParams({
+    required this.startDate,
+    required this.endDate,
+    required this.periodType,
+  });
+  
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is KpiTrendsParams &&
+        other.startDate == startDate &&
+        other.endDate == endDate &&
+        other.periodType == periodType;
+  }
+  
+  @override
+  int get hashCode => Object.hash(startDate, endDate, periodType);
+}

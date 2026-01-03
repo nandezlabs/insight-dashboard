@@ -41,6 +41,12 @@ class _AppShellState extends ConsumerState<AppShell> with SingleTickerProviderSt
       route: '/analytics',
     ),
     _NavigationTab(
+      label: 'Goals',
+      icon: Icons.flag_outlined,
+      selectedIcon: Icons.flag,
+      route: '/goals',
+    ),
+    _NavigationTab(
       label: 'Settings',
       icon: Icons.settings_outlined,
       selectedIcon: Icons.settings,

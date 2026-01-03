@@ -46,14 +46,34 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final user = await _authRepository.restoreSession();
       state = AuthState(user: user, isLoading: false);
     } catch (e) {
+      print('Error restoring session: $e');
       state = const AuthState(isLoading: false);
     }
   }
 
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String storeCode, String password) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final authToken = await _authRepository.login(email, password);
+      print('Attempting login with storeCode: $storeCode');
+      final authToken = await _authRepository.login(storeCode, password);
+      print('Login successful, user: ${authToken.user.username}');
+      state = AuthState(user: authToken.user, isLoading: false);
+      return true;
+    } on ApiException catch (e) {
+      print('Login failed - ApiException: ${e.message}');
+      state = AuthState(isLoading: false, error: e.message);
+      return false;
+    } catch (e) {
+      print('Login failed - Unexpected error: $e');
+      state = AuthState(isLoading: false, error: 'An unexpected error occurred: $e');
+      return false;
+    }
+  }
+
+  Future<bool> createAccount(String storeCode, String password) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final authToken = await _authRepository.createAccount(storeCode, password);
       state = AuthState(user: authToken.user, isLoading: false);
       return true;
     } on ApiException catch (e) {
@@ -66,10 +86,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<bool> signup(String email, String password, String fullName) async {
+    // Deprecated: Use createAccount instead
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final user = await _authRepository.signup(email, password, fullName);
-      // After signup, automatically log in
+      await _authRepository.createAccount(email, password);
+      // After account creation, automatically log in
       return await login(email, password);
     } on ApiException catch (e) {
       state = AuthState(isLoading: false, error: e.message);

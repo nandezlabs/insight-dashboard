@@ -1,22 +1,102 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:insight_ui/insight_ui.dart';
+import '../../core/providers/auth_provider.dart';
+import '../sync/sync_status_indicator.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+    
     return Scaffold(
       backgroundColor: AppColors.background,
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          Text(
-            'Settings',
-            style: AppTextStyles.headlineMedium.copyWith(color: AppColors.textPrimary),
+          // Header with user info
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Settings',
+                      style: AppTextStyles.headlineMedium.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (user != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        user.username,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SyncStatusIndicator(),
+            ],
           ),
-          const SizedBox(height: 24),
           
+          const SizedBox(height: 32),
+          
+          // Profile Section
+          _SettingsSection(
+            title: 'Profile',
+            items: [
+              _SettingsItem(
+                icon: Icons.person_outline,
+                title: 'Account Information',
+                subtitle: user?.fullName ?? 'Not set',
+                onTap: () => _showComingSoon(context, 'Profile Settings'),
+              ),
+              _SettingsItem(
+                icon: Icons.lock_outline,
+                title: 'Change Password',
+                subtitle: 'Update your password',
+                onTap: () => _showComingSoon(context, 'Change Password'),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Sync Section
+          _SettingsSection(
+            title: 'Data Sync',
+            items: [
+              _SettingsItem(
+                icon: Icons.cloud_sync,
+                title: 'Sync Settings',
+                subtitle: 'Manage data synchronization',
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const SyncDialog(),
+                  );
+                },
+              ),
+              _SettingsItem(
+                icon: Icons.storage,
+                title: 'Local Storage',
+                subtitle: 'Manage offline data',
+                onTap: () => _showComingSoon(context, 'Local Storage'),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Business Configuration
           _SettingsSection(
             title: 'Business Configuration',
             items: [
@@ -24,68 +104,146 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.calendar_today,
                 title: 'Business Calendar',
                 subtitle: 'Configure fiscal year and periods',
-                onTap: () {},
+                onTap: () => _showComingSoon(context, 'Business Calendar'),
               ),
               _SettingsItem(
-                icon: Icons.flag,
+                icon: Icons.flag_outlined,
                 title: 'Goals & Targets',
                 subtitle: 'Set performance goals',
-                onTap: () {},
+                onTap: () => _showComingSoon(context, 'Goals & Targets'),
               ),
               _SettingsItem(
-                icon: Icons.access_time,
-                title: 'Timeframes',
-                subtitle: 'Manage custom timeframes',
-                onTap: () {},
+                icon: Icons.schedule,
+                title: 'Form Scheduling',
+                subtitle: 'Configure default schedules',
+                onTap: () => _showComingSoon(context, 'Form Scheduling'),
               ),
             ],
           ),
           
           const SizedBox(height: 32),
           
+          // Store Configuration (for Store app)
           _SettingsSection(
-            title: 'Team Management',
+            title: 'Store Configuration',
             items: [
               _SettingsItem(
-                icon: Icons.people,
-                title: 'Team Members',
-                subtitle: 'Manage your team',
-                onTap: () {},
-              ),
-              _SettingsItem(
-                icon: Icons.location_on,
+                icon: Icons.location_on_outlined,
                 title: 'Geofencing',
-                subtitle: 'Location-based access',
-                onTap: () {},
+                subtitle: 'Location-based access control',
+                onTap: () => _showComingSoon(context, 'Geofencing'),
+              ),
+              _SettingsItem(
+                icon: Icons.cloud_outlined,
+                title: 'Weather Integration',
+                subtitle: 'Configure weather service',
+                onTap: () => _showComingSoon(context, 'Weather Integration'),
               ),
             ],
           ),
           
           const SizedBox(height: 32),
           
+          // Notifications
           _SettingsSection(
-            title: 'Data',
+            title: 'Notifications',
             items: [
               _SettingsItem(
-                icon: Icons.import_export,
-                title: 'Import/Export',
-                subtitle: 'Manage your data',
-                onTap: () {},
+                icon: Icons.notifications_outlined,
+                title: 'Push Notifications',
+                subtitle: 'Manage notification preferences',
+                onTap: () => _showComingSoon(context, 'Notifications'),
               ),
               _SettingsItem(
-                icon: Icons.sync,
-                title: 'Sync Settings',
-                subtitle: 'Configure synchronization',
-                onTap: () {},
+                icon: Icons.email_outlined,
+                title: 'Email Notifications',
+                subtitle: 'Configure email alerts',
+                onTap: () => _showComingSoon(context, 'Email Notifications'),
               ),
             ],
           ),
+          
+          const SizedBox(height: 32),
+          
+          // About
+          _SettingsSection(
+            title: 'About',
+            items: [
+              _SettingsItem(
+                icon: Icons.info_outline,
+                title: 'App Version',
+                subtitle: '1.0.0+1',
+                onTap: () {},
+              ),
+              _SettingsItem(
+                icon: Icons.description_outlined,
+                title: 'Terms & Privacy',
+                subtitle: 'Legal information',
+                onTap: () => _showComingSoon(context, 'Terms & Privacy'),
+              ),
+              _SettingsItem(
+                icon: Icons.help_outline,
+                title: 'Help & Support',
+                subtitle: 'Get assistance',
+                onTap: () => _showComingSoon(context, 'Help & Support'),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 48),
+          
+          // Logout Button
+          Center(
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Logout'),
+                    content: const Text('Are you sure you want to logout?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel'),
+                      ),
+                      FilledButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.error,
+                        ),
+                        child: const Text('Logout'),
+                      ),
+                    ],
+                  ),
+                );
+                
+                if (confirm == true) {
+                  await ref.read(authProvider.notifier).logout();
+                }
+              },
+              icon: const Icon(Icons.logout),
+              label: const Text('Logout'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.error,
+                side: const BorderSide(color: AppColors.error),
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 24),
         ],
       ),
     );
   }
+
+  void _showComingSoon(BuildContext context, String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$feature coming soon')),
+    );
+  }
 }
 
+// Settings Section Widget
 class _SettingsSection extends StatelessWidget {
   final String title;
   final List<_SettingsItem> items;
@@ -120,7 +278,7 @@ class _SettingsSection extends StatelessWidget {
                       children: [
                         item,
                         if (item != items.last)
-                          Divider(height: 1, color: AppColors.border),
+                          const Divider(height: 1, color: AppColors.border),
                       ],
                     ))
                 .toList(),
@@ -131,6 +289,7 @@ class _SettingsSection extends StatelessWidget {
   }
 }
 
+// Settings Item Widget
 class _SettingsItem extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -173,7 +332,7 @@ class _SettingsItem extends StatelessWidget {
           color: AppColors.textSecondary,
         ),
       ),
-      trailing: Icon(
+      trailing: const Icon(
         Icons.chevron_right,
         color: AppColors.textSecondary,
       ),

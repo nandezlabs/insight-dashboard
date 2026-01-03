@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -5,6 +6,8 @@ import 'package:insight_core/insight_core.dart';
 import 'package:insight_ui/insight_ui.dart';
 import '../../core/providers/app_providers.dart';
 import 'models/completion_stats.dart';
+import 'services/export_service.dart';
+import 'kpi_trends_tab.dart';
 
 class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
@@ -17,6 +20,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   DateTime? _startDate;
   DateTime? _endDate;
   String? _selectedFormId;
+  bool _isExporting = false;
   
   @override
   void initState() {
@@ -24,6 +28,176 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     // Default to current period
     _startDate = DateTime.now().subtract(const Duration(days: 7));
     _endDate = DateTime.now();
+  }
+
+  Future<void> _handleExport(String exportType, CompletionStats stats) async {
+    setState(() => _isExporting = true);
+    
+    try {
+      final submissionRepo = ref.read(submissionRepositoryProvider);
+      final formRepo = ref.read(formRepositoryProvider);
+      
+      // Fetch all data needed for export
+      final allForms = await formRepo.getAllForms();
+      final formsMap = {for (var f in allForms) f.id: f};
+      
+      List<Submission> submissions;
+      if (_startDate != null && _endDate != null) {
+        submissions = await submissionRepo.getSubmissionsByDateRange(
+          _startDate!,
+          _endDate!,
+        );
+      } else {
+        // Fetch recent submissions (last 30 days)
+        submissions = await submissionRepo.getSubmissionsByDateRange(
+          DateTime.now().subtract(const Duration(days: 30)),
+          DateTime.now(),
+        );
+      }
+      
+      // Filter by selected form if applicable
+      if (_selectedFormId != null) {
+        submissions = submissions.where((s) => s.formId == _selectedFormId).toList();
+      }
+      
+      // Fetch answers for all submissions
+      final answersMap = <String, List<SubmissionAnswer>>{};
+      for (final submission in submissions) {
+        try {
+          final answers = await submissionRepo.getSubmissionAnswers(submission.id);
+          answersMap[submission.id] = answers;
+        } catch (e) {
+          answersMap[submission.id] = [];
+        }
+      }
+      
+      // Calculate statistics needed for exports
+      final submissionCounts = <String, int>{};
+      final completionRates = <String, double>{};
+      final avgCompletionTimes = <String, Duration>{};
+      
+      for (final form in allForms) {
+        final formSubmissions = submissions.where((s) => s.formId == form.id).toList();
+        submissionCounts[form.id] = formSubmissions.length;
+        
+        if (formSubmissions.isNotEmpty) {
+          final completed = formSubmissions.where((s) => s.status == SubmissionStatus.completed).length;
+          completionRates[form.id] = completed / formSubmissions.length;
+          
+          // TODO: Calculate average completion time when Submission model has completionTime field
+          // For now, we'll skip this calculation
+        }
+      }
+      
+      // Export based on type
+      late final File exportFile;
+      switch (exportType) {
+        case 'csv_basic':
+          exportFile = await ExportService.exportSubmissionsToCSV(
+            submissions: submissions,
+            forms: formsMap,
+            answers: answersMap,
+            startDate: _startDate,
+            endDate: _endDate,
+          );
+          break;
+          
+        case 'csv_detailed':
+          // Fetch all fields for all forms
+          final formFieldsMap = <String, List<Field>>{};
+          for (final form in allForms) {
+            try {
+              final fields = await formRepo.getFormFields(form.id);
+              formFieldsMap[form.id] = fields;
+            } catch (e) {
+              formFieldsMap[form.id] = [];
+            }
+          }
+          
+          exportFile = await ExportService.exportDetailedSubmissionsToCSV(
+            submissions: submissions,
+            forms: formsMap,
+            answers: answersMap,
+            formFields: formFieldsMap,
+          );
+          break;
+          
+        case 'csv_stats':
+          exportFile = await ExportService.exportStatisticsToCSV(
+            forms: formsMap,
+            submissionCounts: submissionCounts,
+            completionRates: completionRates,
+            avgCompletionTimes: avgCompletionTimes,
+          );
+          break;
+          
+        case 'pdf_report':
+          // Generate PDF report
+          exportFile = await ExportService.generatePDFReport(
+            submissions: submissions,
+            forms: formsMap,
+            answers: answersMap,
+            submissionCounts: submissionCounts,
+            completionRates: completionRates,
+            startDate: _startDate,
+            endDate: _endDate,
+            storeName: 'My Store', // TODO: Get actual store name
+          );
+          break;
+          
+        case 'pdf_print':
+          // Print PDF directly
+          await ExportService.printPDF(
+            submissions: submissions,
+            forms: formsMap,
+            answers: answersMap,
+            submissionCounts: submissionCounts,
+            completionRates: completionRates,
+            startDate: _startDate,
+            endDate: _endDate,
+            storeName: 'My Store', // TODO: Get actual store name
+          );
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('PDF ready for printing'),
+                backgroundColor: AppColors.success,
+              ),
+            );
+            setState(() => _isExporting = false);
+          }
+          return; // Exit early for print
+          
+        default:
+          throw Exception('Unknown export type: $exportType');
+      }
+      
+      // Share the file (skip for print option)
+      await ExportService.shareFile(exportFile);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Export completed successfully'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Export failed: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isExporting = false);
+      }
+    }
   }
 
   @override
@@ -75,15 +249,63 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                             ],
                           ),
                         ),
-                        IconButton(
+                        PopupMenuButton<String>(
                           icon: const Icon(Icons.file_download_outlined),
-                          onPressed: () {
-                            // TODO: Export functionality
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Export coming soon')),
-                            );
-                          },
                           tooltip: 'Export Report',
+                          onSelected: (value) => _handleExport(value, stats),
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: 'csv_basic',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.table_chart),
+                                  SizedBox(width: 12),
+                                  Text('Export Submissions (Basic)'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'csv_detailed',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.table_rows),
+                                  SizedBox(width: 12),
+                                  Text('Export Submissions (Detailed)'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'csv_stats',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.analytics),
+                                  SizedBox(width: 12),
+                                  Text('Export Statistics'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuDivider(),
+                            const PopupMenuItem(
+                              value: 'pdf_report',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.picture_as_pdf),
+                                  SizedBox(width: 12),
+                                  Text('Generate PDF Report'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'pdf_print',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.print),
+                                  SizedBox(width: 12),
+                                  Text('Print PDF Report'),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
