@@ -65,9 +65,30 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 API will be available at: http://localhost:8000
 API docs at: http://localhost:8000/docs
 
-## Deployment on NAS
+## Deployment Options
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
+### Hostinger VPS (Recommended) ⭐
+
+**Quick Start**: [HOSTINGER_QUICKSTART.md](./HOSTINGER_QUICKSTART.md)  
+**Full Guide**: [HOSTINGER_DEPLOYMENT.md](./HOSTINGER_DEPLOYMENT.md)
+
+Deploy to Hostinger VPS with Docker, PostgreSQL, and SSL in 15 minutes:
+
+```bash
+# On your Hostinger VPS
+git clone https://github.com/yourusername/insight.git /opt/insight
+cd /opt/insight/backend
+cp .env.production .env
+# Edit .env with your settings
+./setup-nginx.sh
+./deploy-hostinger.sh
+```
+
+**Cost**: $5.99-$23.99/month | **Setup Time**: 15 mins
+
+### UGREEN NAS (Legacy)
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for NAS deployment with Tailscale VPN.
 
 Quick deploy:
 
