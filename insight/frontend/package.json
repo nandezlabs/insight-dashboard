@@ -22,6 +22,8 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
+    "survey-core": "^2.5.24",
+    "survey-creator-core": "^2.5.24",
     "survey-creator-react": "^2.5.24",
     "survey-react-ui": "^2.5.24"
   },
