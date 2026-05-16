@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useOne, useUpdate } from "@refinedev/core";
 import { ArrowLeft, Save } from "lucide-react";
@@ -24,10 +24,12 @@ export default function EditFormPage() {
   const params = useParams();
   const formId = params?.id as string;
 
-  const { data: formData, isLoading: isLoadingForm } = useOne({
+  const { query } = useOne({
     resource: "form_templates",
     id: formId,
   });
+
+  const { data: formData, isLoading: isLoadingForm } = query || {};
 
   const { mutate: updateForm, isLoading: isUpdating } = useUpdate();
 
@@ -35,24 +37,27 @@ export default function EditFormPage() {
   const [formStatus, setFormStatus] = useState<"draft" | "active">("draft");
   const [creator, setCreator] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
+  const creatorInitialized = useRef(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (formData?.data && typeof window !== "undefined" && !creator) {
+    if (formData?.data && typeof window !== "undefined" && !creatorInitialized.current) {
+      creatorInitialized.current = true;
+      
       setFormName(formData.data.name || "");
       setFormStatus(formData.data.status || "draft");
 
       // Import Survey Creator dynamically on client side
-      import("survey-creator-core").then(({ SurveyCreator }) => {
+      import("survey-creator-core").then(({ SurveyCreatorModel }) => {
         const options = {
           showLogicTab: true,
           showTranslationTab: false,
           showJSONEditorTab: false,
         };
-        const creatorInstance = new SurveyCreator(options);
+        const creatorInstance = new SurveyCreatorModel(options);
         
         // Load existing schema or create default
         const existingSchema = formData.data.schema || {
@@ -66,9 +71,12 @@ export default function EditFormPage() {
         
         creatorInstance.JSON = existingSchema;
         setCreator(creatorInstance);
+      }).catch((error) => {
+        console.error("Failed to load Survey Creator:", error);
+        creatorInitialized.current = false; // Allow retry on error
       });
     }
-  }, [formData, creator]);
+  }, [formData]);
 
   const handleSave = () => {
     if (!formName.trim()) {
