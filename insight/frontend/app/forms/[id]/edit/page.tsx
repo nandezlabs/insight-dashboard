@@ -3,13 +3,20 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useOne, useUpdate } from "@refinedev/core";
-import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, X } from "lucide-react";
 import Link from "next/link";
 
 interface FormField {
   key: string;
   label: string;
-  type: "textfield" | "number" | "textarea" | "select" | "checkbox" | "date" | "file";
+  type:
+    | "textfield"
+    | "number"
+    | "textarea"
+    | "select"
+    | "checkbox"
+    | "date"
+    | "file";
   required?: boolean;
   placeholder?: string;
   options?: string[];
@@ -380,6 +387,51 @@ export default function EditFormPage() {
                         </div>
                       )}
 
+                      {field.type === "select" && (
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-2">
+                            Options
+                          </label>
+                          <div className="space-y-2">
+                            {(field.options || []).map((option, optIndex) => (
+                              <div key={optIndex} className="flex gap-2">
+                                <input
+                                  type="text"
+                                  value={option}
+                                  onChange={(e) => {
+                                    const newOptions = [...(field.options || [])];
+                                    newOptions[optIndex] = e.target.value;
+                                    updateField(index, { options: newOptions });
+                                  }}
+                                  placeholder={`Option ${optIndex + 1}`}
+                                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg"
+                                />
+                                <button
+                                  onClick={() => {
+                                    const newOptions = (field.options || []).filter(
+                                      (_, i) => i !== optIndex
+                                    );
+                                    updateField(index, { options: newOptions });
+                                  }}
+                                  className="p-2 text-red-600 hover:bg-red-50 rounded"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ))}
+                            <button
+                              onClick={() => {
+                                const newOptions = [...(field.options || []), ""];
+                                updateField(index, { options: newOptions });
+                              }}
+                              className="w-full px-3 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
+                            >
+                              + Add Option
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex items-center">
                         <input
                           type="checkbox"
@@ -445,6 +497,18 @@ export default function EditFormPage() {
                             {field.placeholder || field.label}
                           </span>
                         </div>
+                      ) : field.type === "select" ? (
+                        <select
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
+                          disabled
+                        >
+                          <option value="">Select...</option>
+                          {(field.options || []).map((opt, i) => (
+                            <option key={i} value={opt}>
+                              {opt || `Option ${i + 1}`}
+                            </option>
+                          ))}
+                        </select>
                       ) : field.type === "file" ? (
                         <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center">
                           <span className="text-xs text-gray-500">

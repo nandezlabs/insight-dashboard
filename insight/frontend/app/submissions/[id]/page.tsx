@@ -178,7 +178,9 @@ export default function SubmissionViewPage() {
                                   <FileText className="w-4 h-4 text-blue-600" />
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-gray-900 truncate">
-                                      {file.originalName || file.name || `File ${idx + 1}`}
+                                      {file.originalName ||
+                                        file.name ||
+                                        `File ${idx + 1}`}
                                     </p>
                                     {file.size && (
                                       <p className="text-xs text-gray-500">

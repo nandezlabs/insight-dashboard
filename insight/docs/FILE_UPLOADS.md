@@ -5,6 +5,7 @@ This guide explains how to set up and use file uploads in the Insight Dashboard.
 ## Overview
 
 The Insight Dashboard supports file uploads in forms using:
+
 - **FormIO.js** for the file upload UI component
 - **Supabase Storage** for file storage (optional, uses base64 by default)
 - **Database tracking** for file metadata
@@ -32,7 +33,7 @@ File uploads work out of the box using base64 encoding. Files are stored directl
 ### Limitations of Base64 Storage
 
 - ✅ **Pros**: Simple, no configuration needed, works immediately
-- ❌ **Cons**: 
+- ❌ **Cons**:
   - Database size increases rapidly (files stored in JSON)
   - 10MB file size limit recommended
   - Not ideal for images/media galleries
@@ -57,6 +58,7 @@ For production use with larger files, set up Supabase Storage.
 In the Supabase Dashboard, go to **Storage → Policies** and create:
 
 **1. Allow Public Read Access**:
+
 ```sql
 CREATE POLICY "Public read access"
 ON storage.objects FOR SELECT
@@ -65,6 +67,7 @@ USING (bucket_id = 'uploads');
 ```
 
 **2. Allow Authenticated Upload**:
+
 ```sql
 CREATE POLICY "Authenticated users can upload"
 ON storage.objects FOR INSERT
@@ -73,6 +76,7 @@ WITH CHECK (bucket_id = 'uploads');
 ```
 
 **3. Allow Authenticated Delete**:
+
 ```sql
 CREATE POLICY "Authenticated users can delete their files"
 ON storage.objects FOR DELETE
@@ -85,6 +89,7 @@ USING (bucket_id = 'uploads');
 When creating forms with file fields, FormIO will automatically use the configured storage.
 
 The file upload configuration in the form builder already includes:
+
 - Storage: `base64` (can be changed to `url` for Supabase)
 - File pattern: Configurable accepted file types
 - Max file size: 10MB default
@@ -193,6 +198,7 @@ getFileUrl(filePath: string): Promise<string | null>
 ## Support
 
 For issues or questions about file uploads:
+
 1. Check the [QUICKSTART.md](../QUICKSTART.md) guide
 2. Review [docs/SETUP.md](SETUP.md) for environment configuration
 3. Check Supabase Storage logs in the dashboard
