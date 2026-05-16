@@ -1,135 +1,152 @@
-# Insight
+# Insight Dashboard
 
-A powerful business operations management system with form creation and completion capabilities.
+A full-stack web dashboard for single-store inventory management with mobile-first design, offline capability, and comprehensive monitoring.
 
-## Project Structure
+## 🚀 Features
+
+- **Dynamic Forms**: Auto-save, scheduled submission, file attachments with FormIO.js
+- **Data Visualization**: Interactive charts with Recharts
+- **Mobile-First**: Responsive design optimized for tablets and phones
+- **Offline Capable**: 7-day cache with automatic sync
+- **Export Tools**: CSV, Excel, PDF generation
+- **Analytics**: Form completion tracking and abandonment analysis
+- **Alert System**: Real-time notifications with email summaries
+- **Monitoring**: Sentry integration with in-app error logs
+
+## 📚 Tech Stack
+
+### Frontend
+- **Framework**: Next.js 14+ (App Router)
+- **Language**: TypeScript
+- **UI Framework**: Refine (headless) + Tailwind CSS
+- **Charts**: Recharts
+- **Forms**: FormIO.js
+- **State**: React Query (via Refine)
+
+### Backend
+- **Framework**: Python FastAPI
+- **Database**: Supabase PostgreSQL
+- **Storage**: Supabase Storage
+- **Cache**: SQLite (optional, 7-day)
+
+### Infrastructure
+- **Hosting**: Hostinger VPS (2GB RAM)
+- **Web Server**: Nginx
+- **SSL**: Let's Encrypt
+- **CI/CD**: GitHub Actions
+- **Monitoring**: Sentry
+- **Email**: SMTP (Gmail/SendGrid)
+
+## 🏗️ Project Structure
 
 ```
 insight/
-├── apps/
-│   ├── store_manager/    # Manager app for form creation and analytics
-│   └── store/            # Store app for form completion
-├── backend/              # FastAPI server for NAS deployment
-├── packages/
-│   ├── insight_core/     # Shared business logic and data models
-│   └── insight_ui/       # Shared UI components and themes
-├── supabase/             # Database schema and setup
-└── melos.yaml           # Monorepo configuration
+├── frontend/           # Next.js application
+│   ├── app/           # App Router pages
+│   ├── components/    # React components
+│   ├── lib/           # Utilities and clients
+│   └── public/        # Static assets
+├── backend/           # Python FastAPI
+│   ├── api/           # API routes
+│   ├── services/      # Business logic
+│   ├── models/        # Database models
+│   └── tests/         # Test suite
+├── docs/              # Documentation
+├── scripts/           # Deployment scripts
+└── .github/           # CI/CD workflows
 ```
 
-## Features
+## 🛠️ Setup
 
-### Store Manager
+See [docs/SETUP.md](docs/SETUP.md) for detailed setup instructions.
 
-- Drag-and-drop form builder with multi-level templates
-- Business calendar tracking (Week/Period/Quarter)
-- Real-time progress monitoring
-- Advanced scheduling and assignment system
-- Analytics dashboard with KPIs
+### Quick Start
 
-### Store
+1. **Clone and install dependencies**:
+   ```bash
+   git clone https://github.com/yourusername/insight.git
+   cd insight
+   
+   # Frontend
+   cd frontend
+   npm install
+   
+   # Backend
+   cd ../backend
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
 
-- Intuitive form completion interface
-- Auto-save functionality
-- Operations dashboard with today's metrics
-- Weather integration and team schedule
-- Geofencing security
+2. **Configure environment**:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Supabase credentials
+   ```
 
-## Tech Stack
+3. **Run development servers**:
+   ```bash
+   # Frontend (terminal 1)
+   cd frontend
+   npm run dev
+   
+   # Backend (terminal 2)
+   cd backend
+   uvicorn main:app --reload
+   ```
 
-- **Framework**: Flutter (iOS, Android, macOS)
-- **Backend**: FastAPI (Python) + PostgreSQL on UGREEN NAS
-- **Networking**: Tailscale VPN for secure remote access
-- **State Management**: Riverpod
-- **Routing**: Go Router
-- **Local Storage**: Drift (SQLite) with encryption
-- **Monorepo**: Melos
-- **Deployment**: Docker + Docker Compose
+## 📖 Documentation
 
-## Getting Started
+- [Setup Guide](docs/SETUP.md) - Complete installation instructions
+- [Environment Variables](docs/ENV.md) - Configuration reference
+- [Backup Procedures](docs/BACKUP.md) - Backup and restore guide
+- [Disaster Recovery](docs/DISASTER_RECOVERY.md) - Recovery procedures
 
-### Prerequisites
-
-- Flutter SDK 3.24.0+
-- Dart 3.5.0+
-- Xcode (for iOS/macOS)
-- Android Studio (for Android)
-- Melos CLI
-
-### Setup
-
-1. Install Melos:
-
-```bash
-dart pub global activate melos
-```
-
-2. Bootstrap the project:
-
-````bash
-melos bootstrap
-```Set up backend on your NAS (see `backend/DEPLOYMENT.md`)
-
-4. Create `.env` files in both apps with your Tailscale IP
-
-5. Run the apps:
+## 🧪 Testing
 
 ```bash
-# Store Manager
-cd apps/store_manager && flutter run
-
-# Store
-cd apps/store && flutter run
-````
-
-### Backend Deployment
-
-Deploy the FastAPI backend on your UGREEN NAS:
-
-```bash
+# Backend tests
 cd backend
+pytest
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your settings
+# Frontend tests
+cd frontend
+npm test
 
-# Deploy with one command
-./deploy.sh
+# E2E tests
+npm run test:e2e
 ```
 
-See [backend/DEPLOYMENT.md](backend/DEPLOYMENT.md) for detailed instructions.tore
-cd apps/store && flutter run
+## 🚀 Deployment
 
-````
-
-## Development
-
-### Available Scripts
+See [docs/SETUP.md](docs/SETUP.md#deployment) for production deployment.
 
 ```bash
-melos analyze      # Run static analysis
-melos format       # Format all code
-melos test         # Run all tests
-melos clean        # Clean all packages
-melos get          # Get dependencies
-````
+# Deploy to staging
+git push origin staging
 
-### Building
-
-```bash
-melos build:ios      # Build iOS apps
-melos build:android  # Build Android apps
-melos build:macos    # Build macOS apps
+# Deploy to production
+git push origin main
 ```
 
-## Security
+## 📊 Monitoring
 
-- AES-256 encryption for sensitive data
-- Geofencing for location-based access control
-- Row Level Security (RLS) in Supabase
-- HTTPS/TLS 1.3 for all communications
-- Encrypted local storage
+- **Error Tracking**: Sentry dashboard at sentry.io
+- **Health Check**: https://your-domain.com/api/health
+- **Alert Center**: In-app bell icon for system alerts
 
-## License
+## 🔒 Security
 
-Private - All Rights Reserved
+- HTTPS enforced via Let's Encrypt
+- Basic authentication via Nginx
+- Supabase Row Level Security enabled
+- Environment variables for sensitive data
+- Regular security updates via Dependabot
+
+## 📝 License
+
+MIT
+
+## 👤 Author
+
+Built for single-store inventory management.

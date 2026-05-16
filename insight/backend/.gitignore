@@ -4,44 +4,17 @@ __pycache__/
 *$py.class
 *.so
 .Python
-*.egg-info/
-dist/
-build/
 venv/
 env/
-ENV/
 
-# Environment
-.env
-.env.local
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-data/
-postgres-data/
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
 
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 
-# Logs
-*.log
-logs/
-
-# Testing
-.coverage
-htmlcov/
-.pytest_cache/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Uploads
-uploads/
-*.tmp
+# Environment
+.env
