@@ -1,56 +1,52 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useCreate } from "@refinedev/core";
+import { useRouter, useParams } from "next/navigation";
+import { useOne, useUpdate } from "@refinedev/core";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
-const SurveyCreatorComponent = dynamic(
-  () => import("survey-creator-react").then((mod) => mod.SurveyCreatorComponent),
+const FormBuilder = dynamic(
+  () => import("@formio/react").then((mod) => mod.FormBuilder),
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center p-12 bg-white rounded-lg">
+      <div className="flex items-center justify-center p-12">
         <div className="text-gray-600">Loading form builder...</div>
       </div>
     ),
   }
 );
 
-export default function NewFormPage() {
+export default function EditFormPage() {
   const router = useRouter();
-  const { mutate: createForm, isLoading } = useCreate();
+  const params = useParams();
+  const formId = params?.id as string;
+
+  const { data: formData, isLoading: isLoadingForm } = useOne({
+    resource: "form_templates",
+    id: formId,
+  });
+
+  const { mutate: updateForm, isLoading: isUpdating } = useUpdate();
+
   const [formName, setFormName] = useState("");
   const [formStatus, setFormStatus] = useState<"draft" | "active">("draft");
-  const [creator, setCreator] = useState<any>(null);
+  const [schema, setSchema] = useState<any>({ components: [] });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    
-    // Import Survey Creator dynamically on client side
-    if (typeof window !== "undefined") {
-      import("survey-creator-core").then((SurveyCreator) => {
-        const options = {
-          showLogicTab: true,
-          showTranslationTab: false,
-          showJSONEditorTab: false,
-        };
-        const creatorInstance = new SurveyCreator.SurveyCreator(options);
-        creatorInstance.JSON = {
-          pages: [
-            {
-              name: "page1",
-              elements: [],
-            },
-          ],
-        };
-        setCreator(creatorInstance);
-      });
-    }
   }, []);
+
+  useEffect(() => {
+    if (formData?.data) {
+      setFormName(formData.data.name || "");
+      setFormStatus(formData.data.status || "draft");
+      setSchema(formData.data.schema || { components: [] });
+    }
+  }, [formData]);
 
   const handleSave = () => {
     if (!formName.trim()) {
@@ -58,16 +54,10 @@ export default function NewFormPage() {
       return;
     }
 
-    if (!creator) {
-      alert("Form builder is still loading");
-      return;
-    }
-
-    const schema = creator.JSON;
-
-    createForm(
+    updateForm(
       {
         resource: "form_templates",
+        id: formId,
         values: {
           name: formName,
           schema: schema,
@@ -79,17 +69,21 @@ export default function NewFormPage() {
           router.push("/forms");
         },
         onError: (error) => {
-          console.error("Error creating form:", error);
-          alert("Failed to create form. Please try again.");
+          console.error("Error updating form:", error);
+          alert("Failed to update form. Please try again.");
         },
       }
     );
   };
 
-  if (!mounted) {
+  const handleSchemaChange = (newSchema: any) => {
+    setSchema(newSchema);
+  };
+
+  if (!mounted || isLoadingForm) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+        <div className="text-gray-600">Loading form builder...</div>
       </div>
     );
   }
@@ -108,9 +102,7 @@ export default function NewFormPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Link>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  Create New Form
-                </h1>
+                <h1 className="text-3xl font-bold text-gray-900">Edit Form</h1>
                 <p className="mt-1 text-sm text-gray-500">
                   Drag and drop components to build your form
                 </p>
@@ -118,11 +110,11 @@ export default function NewFormPage() {
             </div>
             <button
               onClick={handleSave}
-              disabled={isLoading}
+              disabled={isUpdating}
               className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors"
             >
               <Save className="w-5 h-5 mr-2" />
-              {isLoading ? "Saving..." : "Save Form"}
+              {isUpdating ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </div>
@@ -166,9 +158,43 @@ export default function NewFormPage() {
           </div>
         </div>
 
-        {/* Survey.js Form Builder */}
-        <div className="bg-white rounded-lg shadow overflow-hidden" style={{ minHeight: "600px" }}>
-          {creator && <SurveyCreatorComponent creator={creator} />}
+        {/* FormIO Form Builder */}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <FormBuilder
+            form={schema}
+            onChange={handleSchemaChange}
+            options={{
+              builder: {
+                basic: true,
+                advanced: true,
+                data: true,
+                layout: true,
+                premium: false,
+              },
+              editForm: {
+                textfield: [
+                  {
+                    key: "display",
+                    components: [
+                      { key: "placeholder", ignore: false },
+                      { key: "description", ignore: false },
+                      { key: "tooltip", ignore: false },
+                      { key: "customClass", ignore: false },
+                    ],
+                  },
+                  {
+                    key: "validation",
+                    components: [
+                      { key: "required", ignore: false },
+                      { key: "minLength", ignore: false },
+                      { key: "maxLength", ignore: false },
+                      { key: "pattern", ignore: false },
+                    ],
+                  },
+                ],
+              },
+            }}
+          />
         </div>
       </main>
     </div>

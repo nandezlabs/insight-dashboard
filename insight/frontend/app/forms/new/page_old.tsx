@@ -7,12 +7,12 @@ import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
-const SurveyCreatorComponent = dynamic(
-  () => import("survey-creator-react").then((mod) => mod.SurveyCreatorComponent),
+const FormBuilder = dynamic(
+  () => import("@formio/react").then((mod) => mod.FormBuilder),
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center p-12 bg-white rounded-lg">
+      <div className="flex items-center justify-center p-12">
         <div className="text-gray-600">Loading form builder...</div>
       </div>
     ),
@@ -24,32 +24,11 @@ export default function NewFormPage() {
   const { mutate: createForm, isLoading } = useCreate();
   const [formName, setFormName] = useState("");
   const [formStatus, setFormStatus] = useState<"draft" | "active">("draft");
-  const [creator, setCreator] = useState<any>(null);
+  const [schema, setSchema] = useState<any>({ components: [] });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    
-    // Import Survey Creator dynamically on client side
-    if (typeof window !== "undefined") {
-      import("survey-creator-core").then((SurveyCreator) => {
-        const options = {
-          showLogicTab: true,
-          showTranslationTab: false,
-          showJSONEditorTab: false,
-        };
-        const creatorInstance = new SurveyCreator.SurveyCreator(options);
-        creatorInstance.JSON = {
-          pages: [
-            {
-              name: "page1",
-              elements: [],
-            },
-          ],
-        };
-        setCreator(creatorInstance);
-      });
-    }
   }, []);
 
   const handleSave = () => {
@@ -57,13 +36,6 @@ export default function NewFormPage() {
       alert("Please enter a form name");
       return;
     }
-
-    if (!creator) {
-      alert("Form builder is still loading");
-      return;
-    }
-
-    const schema = creator.JSON;
 
     createForm(
       {
@@ -86,10 +58,14 @@ export default function NewFormPage() {
     );
   };
 
+  const handleSchemaChange = (newSchema: any) => {
+    setSchema(newSchema);
+  };
+
   if (!mounted) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+        <div className="text-gray-600">Loading form builder...</div>
       </div>
     );
   }
@@ -166,9 +142,43 @@ export default function NewFormPage() {
           </div>
         </div>
 
-        {/* Survey.js Form Builder */}
-        <div className="bg-white rounded-lg shadow overflow-hidden" style={{ minHeight: "600px" }}>
-          {creator && <SurveyCreatorComponent creator={creator} />}
+        {/* FormIO Form Builder */}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <FormBuilder
+            form={schema}
+            onChange={handleSchemaChange}
+            options={{
+              builder: {
+                basic: true,
+                advanced: true,
+                data: true,
+                layout: true,
+                premium: false,
+              },
+              editForm: {
+                textfield: [
+                  {
+                    key: "display",
+                    components: [
+                      { key: "placeholder", ignore: false },
+                      { key: "description", ignore: false },
+                      { key: "tooltip", ignore: false },
+                      { key: "customClass", ignore: false },
+                    ],
+                  },
+                  {
+                    key: "validation",
+                    components: [
+                      { key: "required", ignore: false },
+                      { key: "minLength", ignore: false },
+                      { key: "maxLength", ignore: false },
+                      { key: "pattern", ignore: false },
+                    ],
+                  },
+                ],
+              },
+            }}
+          />
         </div>
       </main>
     </div>

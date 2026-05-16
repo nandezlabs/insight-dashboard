@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "survey-core/defaultV2.min.css";
+import "survey-creator-core/survey-creator-core.min.css";
 import { RefineProvider } from "./providers";
 
 const geistSans = Geist({

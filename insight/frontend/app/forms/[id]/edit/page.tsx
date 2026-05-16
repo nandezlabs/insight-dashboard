@@ -7,12 +7,12 @@ import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
-const FormBuilder = dynamic(
-  () => import("@formio/react").then((mod) => mod.FormBuilder),
+const SurveyCreatorComponent = dynamic(
+  () => import("survey-creator-react").then((mod) => mod.SurveyCreatorComponent),
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center p-12">
+      <div className="flex items-center justify-center p-12 bg-white rounded-lg">
         <div className="text-gray-600">Loading form builder...</div>
       </div>
     ),
@@ -33,7 +33,7 @@ export default function EditFormPage() {
 
   const [formName, setFormName] = useState("");
   const [formStatus, setFormStatus] = useState<"draft" | "active">("draft");
-  const [schema, setSchema] = useState<any>({ components: [] });
+  const [creator, setCreator] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -41,18 +41,47 @@ export default function EditFormPage() {
   }, []);
 
   useEffect(() => {
-    if (formData?.data) {
+    if (formData?.data && typeof window !== "undefined" && !creator) {
       setFormName(formData.data.name || "");
       setFormStatus(formData.data.status || "draft");
-      setSchema(formData.data.schema || { components: [] });
+
+      // Import Survey Creator dynamically on client side
+      import("survey-creator-core").then((SurveyCreator) => {
+        const options = {
+          showLogicTab: true,
+          showTranslationTab: false,
+          showJSONEditorTab: false,
+        };
+        const creatorInstance = new SurveyCreator.SurveyCreator(options);
+        
+        // Load existing schema or create default
+        const existingSchema = formData.data.schema || {
+          pages: [
+            {
+              name: "page1",
+              elements: [],
+            },
+          ],
+        };
+        
+        creatorInstance.JSON = existingSchema;
+        setCreator(creatorInstance);
+      });
     }
-  }, [formData]);
+  }, [formData, creator]);
 
   const handleSave = () => {
     if (!formName.trim()) {
       alert("Please enter a form name");
       return;
     }
+
+    if (!creator) {
+      alert("Form builder is still loading");
+      return;
+    }
+
+    const schema = creator.JSON;
 
     updateForm(
       {
@@ -74,10 +103,6 @@ export default function EditFormPage() {
         },
       }
     );
-  };
-
-  const handleSchemaChange = (newSchema: any) => {
-    setSchema(newSchema);
   };
 
   if (!mounted || isLoadingForm) {
@@ -158,43 +183,9 @@ export default function EditFormPage() {
           </div>
         </div>
 
-        {/* FormIO Form Builder */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <FormBuilder
-            form={schema}
-            onChange={handleSchemaChange}
-            options={{
-              builder: {
-                basic: true,
-                advanced: true,
-                data: true,
-                layout: true,
-                premium: false,
-              },
-              editForm: {
-                textfield: [
-                  {
-                    key: "display",
-                    components: [
-                      { key: "placeholder", ignore: false },
-                      { key: "description", ignore: false },
-                      { key: "tooltip", ignore: false },
-                      { key: "customClass", ignore: false },
-                    ],
-                  },
-                  {
-                    key: "validation",
-                    components: [
-                      { key: "required", ignore: false },
-                      { key: "minLength", ignore: false },
-                      { key: "maxLength", ignore: false },
-                      { key: "pattern", ignore: false },
-                    ],
-                  },
-                ],
-              },
-            }}
-          />
+        {/* Survey.js Form Builder */}
+        <div className="bg-white rounded-lg shadow overflow-hidden" style={{ minHeight: "600px" }}>
+          {creator && <SurveyCreatorComponent creator={creator} />}
         </div>
       </main>
     </div>
