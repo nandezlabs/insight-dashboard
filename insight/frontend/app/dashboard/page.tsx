@@ -66,7 +66,7 @@ export default function DashboardPage() {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const recentSubmissions = submissions.filter(
-      (s) => new Date(s.created_at) >= sevenDaysAgo
+      (s) => new Date(s.created_at) >= sevenDaysAgo,
     );
 
     return {
@@ -137,6 +137,7 @@ export default function DashboardPage() {
             <p className="text-gray-600 mt-1">
               Overview of your forms and submissions
             </p>
+          </div>
           <div className="flex gap-3">
             {submissions.length > 0 && <ExportButton />}
             <Link
@@ -145,8 +146,7 @@ export default function DashboardPage() {
             >
               Create Form
             </Link>
-          </divte Form
-          </Link>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -336,7 +336,7 @@ export default function DashboardPage() {
                               day: "numeric",
                               hour: "2-digit",
                               minute: "2-digit",
-                            }
+                            },
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
