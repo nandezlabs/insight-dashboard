@@ -313,7 +313,7 @@ export default function NewFormPage() {
                         </div>
                       )}
 
-                      {field.type === "select" && (
+                      {(field.type === "select" || field.type === "checkbox") && (
                         <div>
                           <label className="block text-xs font-medium text-gray-700 mb-2">
                             Options
@@ -413,15 +413,32 @@ export default function NewFormPage() {
                           disabled
                         />
                       ) : field.type === "checkbox" ? (
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                            disabled
-                          />
-                          <span className="ml-2 text-sm text-gray-600">
-                            {field.placeholder || field.label}
-                          </span>
+                        <div className="space-y-2">
+                          {(field.options && field.options.length > 0) ? (
+                            (field.options || []).map((opt, i) => (
+                              <div key={i} className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                                  disabled
+                                />
+                                <span className="ml-2 text-sm text-gray-600">
+                                  {opt || `Option ${i + 1}`}
+                                </span>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="flex items-center">
+                              <input
+                                type="checkbox"
+                                className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                                disabled
+                              />
+                              <span className="ml-2 text-sm text-gray-600">
+                                {field.placeholder || field.label}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       ) : field.type === "select" ? (
                         <select
