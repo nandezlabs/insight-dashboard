@@ -166,6 +166,44 @@ export default function SubmissionViewPage() {
                         >
                           {value ? "✓ Yes" : "✗ No"}
                         </span>
+                      ) : component.type === "file" ? (
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          {value && Array.isArray(value) && value.length > 0 ? (
+                            <div className="space-y-2">
+                              {value.map((file: any, idx: number) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-center gap-2 p-2 bg-white rounded border border-gray-200"
+                                >
+                                  <FileText className="w-4 h-4 text-blue-600" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                      {file.originalName || file.name || `File ${idx + 1}`}
+                                    </p>
+                                    {file.size && (
+                                      <p className="text-xs text-gray-500">
+                                        {(file.size / 1024).toFixed(2)} KB
+                                      </p>
+                                    )}
+                                  </div>
+                                  {file.url && (
+                                    <a
+                                      href={file.url}
+                                      download={file.originalName || file.name}
+                                      className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                                    >
+                                      Download
+                                    </a>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 italic">
+                              No file uploaded
+                            </span>
+                          )}
+                        </div>
                       ) : component.type === "textarea" ? (
                         <p className="whitespace-pre-wrap bg-gray-50 p-3 rounded-lg">
                           {value || (

@@ -9,10 +9,11 @@ import Link from "next/link";
 interface FormField {
   key: string;
   label: string;
-  type: "textfield" | "number" | "textarea" | "select" | "checkbox" | "date";
+  type: "textfield" | "number" | "textarea" | "select" | "checkbox" | "date" | "file";
   required?: boolean;
   placeholder?: string;
   options?: string[];
+  acceptedFileTypes?: string;
 }
 
 export default function NewFormPage() {
@@ -82,6 +83,11 @@ export default function NewFormPage() {
               value: opt,
             })),
           },
+        }),
+        ...(field.type === "file" && {
+          storage: "base64",
+          filePattern: field.acceptedFileTypes || "*",
+          fileMaxSize: "10MB",
         }),
       })),
     };
@@ -261,6 +267,7 @@ export default function NewFormPage() {
                             <option value="select">Select</option>
                             <option value="checkbox">Checkbox</option>
                             <option value="date">Date</option>
+                            <option value="file">File Upload</option>
                           </select>
                         </div>
                       </div>
@@ -279,6 +286,25 @@ export default function NewFormPage() {
                           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
                         />
                       </div>
+
+                      {field.type === "file" && (
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">
+                            Accepted File Types
+                          </label>
+                          <input
+                            type="text"
+                            value={field.acceptedFileTypes || ""}
+                            onChange={(e) =>
+                              updateField(index, {
+                                acceptedFileTypes: e.target.value,
+                              })
+                            }
+                            placeholder="e.g., .pdf,.doc,.jpg (leave empty for all)"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
+                          />
+                        </div>
+                      )}
 
                       <div className="flex items-center">
                         <input
@@ -343,6 +369,17 @@ export default function NewFormPage() {
                           />
                           <span className="ml-2 text-sm text-gray-600">
                             {field.placeholder || field.label}
+                          </span>
+                        </div>
+                      ) : field.type === "file" ? (
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center">
+                          <span className="text-xs text-gray-500">
+                            📎 Click to upload or drag and drop
+                            {field.acceptedFileTypes && (
+                              <span className="block mt-1">
+                                Accepted: {field.acceptedFileTypes}
+                              </span>
+                            )}
                           </span>
                         </div>
                       ) : (
