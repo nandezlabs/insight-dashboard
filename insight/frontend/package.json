@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@formio/core": "^1.2.0",
     "@formio/react": "^6.2.0",
     "@refinedev/cli": "^2.16.52",
     "@refinedev/core": "^5.0.12",

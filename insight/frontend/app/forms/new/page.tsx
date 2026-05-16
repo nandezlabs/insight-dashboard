@@ -5,7 +5,19 @@ import { useRouter } from "next/navigation";
 import { useCreate } from "@refinedev/core";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
-import { FormBuilder } from "@formio/react";
+import dynamic from "next/dynamic";
+
+const FormBuilder = dynamic(
+  () => import("@formio/react").then((mod) => mod.FormBuilder),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center p-12">
+        <div className="text-gray-600">Loading form builder...</div>
+      </div>
+    ),
+  }
+);
 
 export default function NewFormPage() {
   const router = useRouter();
