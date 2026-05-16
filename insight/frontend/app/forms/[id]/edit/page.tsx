@@ -32,10 +32,14 @@ export default function EditFormPage() {
   const { data: publishedForm, isLoading: isLoadingPublished } = publishedQuery || {};
 
   // Load draft (if exists)
-  const { data: draftData, isLoading: isLoadingDraft } = useList({
+  const { data: draftListData, isLoading: isLoadingDraft } = useList({
     resource: "form_drafts",
     filters: [{ field: "form_id", operator: "eq", value: formId }],
+    pagination: { mode: "off" },
   });
+  
+  // Extract draft from list response
+  const draftData = draftListData?.data?.[0];
 
   const { mutate: updateForm } = useUpdate();
   const { mutate: createDraft } = useCreate();
@@ -56,19 +60,18 @@ export default function EditFormPage() {
   // Initialize creator with draft or published form
   useEffect(() => {
     if (
-      (publishedForm?.data || draftData?.data) &&
+      (publishedForm?.data || draftData) &&
       typeof window !== "undefined" &&
       !creatorInitialized.current
     ) {
       creatorInitialized.current = true;
 
-      // Check if draft exists
-      const draft = draftData?.data?.[0];
-      const schemaToLoad = draft?.data || publishedForm?.data.schema;
+      // Check if draft exists and set schema to load
+      const schemaToLoad = draftData?.data || publishedForm?.data.schema;
       
-      if (draft) {
+      if (draftData) {
         setHasDraft(true);
-        setDraftId(draft.id);
+        setDraftId(draftData.id);
       }
 
       // Import Survey Creator dynamically
