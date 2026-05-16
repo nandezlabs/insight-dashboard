@@ -16,6 +16,7 @@ A full-stack web dashboard for single-store inventory management with mobile-fir
 ## 📚 Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 14+ (App Router)
 - **Language**: TypeScript
 - **UI Framework**: Refine (headless) + Tailwind CSS
@@ -24,12 +25,14 @@ A full-stack web dashboard for single-store inventory management with mobile-fir
 - **State**: React Query (via Refine)
 
 ### Backend
+
 - **Framework**: Python FastAPI
 - **Database**: Supabase PostgreSQL
 - **Storage**: Supabase Storage
 - **Cache**: SQLite (optional, 7-day)
 
 ### Infrastructure
+
 - **Hosting**: Hostinger VPS (2GB RAM)
 - **Web Server**: Nginx
 - **SSL**: Let's Encrypt
@@ -63,14 +66,15 @@ See [docs/SETUP.md](docs/SETUP.md) for detailed setup instructions.
 ### Quick Start
 
 1. **Clone and install dependencies**:
+
    ```bash
    git clone https://github.com/yourusername/insight.git
    cd insight
-   
+
    # Frontend
    cd frontend
    npm install
-   
+
    # Backend
    cd ../backend
    python3 -m venv venv
@@ -79,17 +83,19 @@ See [docs/SETUP.md](docs/SETUP.md) for detailed setup instructions.
    ```
 
 2. **Configure environment**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your Supabase credentials
    ```
 
 3. **Run development servers**:
+
    ```bash
    # Frontend (terminal 1)
    cd frontend
    npm run dev
-   
+
    # Backend (terminal 2)
    cd backend
    uvicorn main:app --reload

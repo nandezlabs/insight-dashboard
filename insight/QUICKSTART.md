@@ -80,6 +80,7 @@ uvicorn main:app --reload --port 8000
 ```
 
 Backend will start at:
+
 - API: http://localhost:8000
 - Docs: http://localhost:8000/docs
 
@@ -100,6 +101,7 @@ Backend will start at:
 ## 🎉 Done!
 
 You now have:
+
 - ✅ Next.js frontend running on port 3000
 - ✅ FastAPI backend running on port 8000
 - ✅ Supabase database with schema
@@ -108,11 +110,13 @@ You now have:
 ## Next Steps
 
 ### Development
+
 - Read `docs/SETUP.md` for full documentation
 - Start building forms in `/forms` page (coming soon)
 - Check `docs/ENV.md` for all configuration options
 
 ### Production Deployment
+
 - Follow `docs/SETUP.md` Part 2 for VPS setup
 - Setup GitHub repository for CI/CD
 - Configure domain and SSL
@@ -120,6 +124,7 @@ You now have:
 ## Troubleshooting
 
 ### Frontend won't start
+
 ```bash
 # Clear cache and reinstall
 cd frontend
@@ -129,6 +134,7 @@ npm run dev
 ```
 
 ### Backend errors
+
 ```bash
 # Check Python version
 python3 --version  # Should be 3.11+
@@ -142,11 +148,13 @@ pip install -r requirements.txt
 ```
 
 ### Database connection errors
+
 - Check Supabase project is active (not paused)
 - Verify credentials in `.env` match Supabase dashboard
 - Make sure you ran `schema.sql` in Supabase SQL Editor
 
 ### Port already in use
+
 ```bash
 # Frontend (port 3000)
 lsof -ti:3000 | xargs kill -9

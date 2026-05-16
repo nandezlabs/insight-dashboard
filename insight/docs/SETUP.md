@@ -5,18 +5,21 @@ Complete guide for setting up the Insight Dashboard from development to producti
 ## 📋 Prerequisites
 
 ### Local Development
+
 - **Node.js**: 20.x or higher
 - **Python**: 3.11 or higher
 - **Git**: Latest version
 - **Code Editor**: VS Code recommended
 
 ### Production VPS (Hostinger)
+
 - **RAM**: 2GB minimum
 - **CPU**: 1-2 cores
 - **Storage**: 200MB minimum for app + cache
 - **OS**: Ubuntu 22.04 LTS (recommended)
 
 ### Third-Party Services
+
 - **Supabase Account**: Free tier (500MB database + 1GB storage)
 - **GitHub Account**: For code hosting and CI/CD
 - **Sentry Account**: Free tier (5k errors/month) - optional but recommended
@@ -118,6 +121,7 @@ API docs at http://localhost:8000/docs
 ### Step 5: Verify Setup
 
 1. **Test Supabase Connection**:
+
    ```bash
    # In backend directory
    python scripts/test_connection.py
@@ -145,6 +149,7 @@ API docs at http://localhost:8000/docs
    - Complete purchase and note credentials
 
 2. **Initial SSH Connection**:
+
    ```bash
    ssh root@your-vps-ip
    ```
@@ -460,6 +465,7 @@ git push -u origin develop
 Go to GitHub Repository → Settings → Secrets and variables → Actions
 
 Add these secrets:
+
 - `VPS_HOST`: Your VPS IP or domain
 - `VPS_USER`: `insight`
 - `VPS_SSH_KEY`: Your private SSH key (content of ~/.ssh/id_rsa)
@@ -497,6 +503,7 @@ git push origin main
 ### Daily Operations
 
 **View Application Logs**:
+
 ```bash
 # Frontend logs
 sudo journalctl -u insight-frontend -n 100 --no-pager
@@ -512,6 +519,7 @@ sudo tail -f /var/log/nginx/error.log
 ```
 
 **Restart Services**:
+
 ```bash
 sudo systemctl restart insight-frontend
 sudo systemctl restart insight-backend
@@ -519,6 +527,7 @@ sudo systemctl restart nginx
 ```
 
 **Update Application**:
+
 ```bash
 cd /home/insight/insight
 git pull origin main
@@ -539,6 +548,7 @@ sudo systemctl restart insight-backend
 ### Weekly Tasks
 
 1. **Check Disk Usage**:
+
    ```bash
    df -h
    du -sh /home/insight/insight/*
@@ -551,6 +561,7 @@ sudo systemctl restart insight-backend
 ### Monthly Tasks
 
 1. **Update System**:
+
    ```bash
    sudo apt update && sudo apt upgrade -y
    sudo systemctl restart insight-frontend
@@ -558,6 +569,7 @@ sudo systemctl restart insight-backend
    ```
 
 2. **Check SSL Certificate**:
+
    ```bash
    sudo certbot certificates
    ```

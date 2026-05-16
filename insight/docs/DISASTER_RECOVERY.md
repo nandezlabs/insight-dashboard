@@ -28,12 +28,12 @@ Critical procedures for recovering from catastrophic failures. Print this docume
 
 ### Recovery Priority Matrix
 
-| Priority | Component | Max Downtime | Data Loss Tolerance |
-|----------|-----------|--------------|---------------------|
-| P0 Critical | Database Access | 30 minutes | None |
-| P1 High | Application Frontend | 2 hours | Last 24 hours |
-| P2 Medium | File Uploads | 4 hours | Last week |
-| P3 Low | Analytics/Reports | 24 hours | Last month |
+| Priority    | Component            | Max Downtime | Data Loss Tolerance |
+| ----------- | -------------------- | ------------ | ------------------- |
+| P0 Critical | Database Access      | 30 minutes   | None                |
+| P1 High     | Application Frontend | 2 hours      | Last 24 hours       |
+| P2 Medium   | File Uploads         | 4 hours      | Last week           |
+| P3 Low      | Analytics/Reports    | 24 hours     | Last month          |
 
 ## 📋 Recovery Procedures by Scenario
 
@@ -125,6 +125,7 @@ curl https://your-domain.com/api/health
 ```
 
 **Verification Checklist**:
+
 - [ ] Frontend loads at https://your-domain.com
 - [ ] Basic auth works
 - [ ] Backend API responds at /api/python/health
@@ -134,6 +135,7 @@ curl https://your-domain.com/api/health
 - [ ] Check systemd logs for errors
 
 **Post-Recovery**:
+
 - Document what caused VPS failure
 - Review Hostinger support ticket
 - Consider upgrading VPS plan if resource-related
@@ -205,6 +207,7 @@ sudo systemctl start insight-backend
 ```
 
 **Verification Checklist**:
+
 - [ ] Row counts match expected values
 - [ ] Recent forms are visible
 - [ ] Can create new submissions
@@ -212,6 +215,7 @@ sudo systemctl start insight-backend
 - [ ] Files are accessible
 
 **Post-Recovery**:
+
 - Identify what caused corruption (disk full, bad query, etc.)
 - Review recent code changes
 - Consider upgrading Supabase to Pro for point-in-time recovery
@@ -297,6 +301,7 @@ curl https://your-domain.com/api/health
 ```
 
 **Verification Checklist**:
+
 - [ ] All forms restored
 - [ ] Submissions count matches backup
 - [ ] Files are accessible
@@ -368,6 +373,7 @@ sudo systemctl start insight-backend
 ```
 
 **Verification Checklist**:
+
 - [ ] Deleted data is restored
 - [ ] New data created after backup is NOT lost (merge if needed)
 - [ ] Application functions normally
@@ -473,6 +479,7 @@ systemctl restart sshd
 ```
 
 **Post-Recovery Checklist**:
+
 - [ ] All credentials rotated
 - [ ] New VPS with hardened security
 - [ ] No backdoors in code
@@ -514,12 +521,14 @@ If you lose Supabase database password:
 ## 📞 Emergency Contacts
 
 ### Service Providers
+
 - **Hostinger Support**: https://www.hostinger.com/support (24/7 live chat)
 - **Supabase Support**: support@supabase.com (email), https://supabase.com/support
 - **GitHub Support**: https://support.github.com
 - **Sentry Support**: https://sentry.io/support
 
 ### External Resources
+
 - **DigitalOcean Community**: https://www.digitalocean.com/community (troubleshooting guides)
 - **Stack Overflow**: https://stackoverflow.com/questions/tagged/supabase
 - **Supabase Discord**: https://discord.supabase.com (community support)

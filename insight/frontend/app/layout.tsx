@@ -14,22 +14,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Insight Dashboard',
-  description: 'Inventory management dashboard with offline capability',
-  manifest: '/manifest.json',
-  themeColor: '#3b82f6',
+  title: "Insight Dashboard",
+  description: "Inventory management dashboard with offline capability",
+  manifest: "/manifest.json",
+  themeColor: "#3b82f6",
   viewport: {
-    width: 'device-width',
+    width: "device-width",
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
-    title: 'Insight',
+    statusBarStyle: "default",
+    title: "Insight",
   },
-}
+};
 
 export default function RootLayout({
   children,

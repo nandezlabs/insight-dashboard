@@ -11,6 +11,7 @@ This document describes all environment variables used by the Insight Dashboard.
 ### Supabase Configuration
 
 #### `NEXT_PUBLIC_SUPABASE_URL`
+
 - **Type**: String (URL)
 - **Required**: Yes
 - **Example**: `https://xyzcompany.supabase.co`
@@ -18,6 +19,7 @@ This document describes all environment variables used by the Insight Dashboard.
 - **Used By**: Frontend, Backend
 
 #### `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
 - **Type**: String (JWT)
 - **Required**: Yes
 - **Example**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
@@ -25,6 +27,7 @@ This document describes all environment variables used by the Insight Dashboard.
 - **Used By**: Frontend
 
 #### `SUPABASE_SERVICE_ROLE_KEY`
+
 - **Type**: String (JWT)
 - **Required**: Yes
 - **Example**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
@@ -39,30 +42,35 @@ Choose **one** email provider:
 #### Option 1: Gmail SMTP
 
 ##### `SMTP_HOST`
+
 - **Type**: String
 - **Required**: If using Gmail
 - **Example**: `smtp.gmail.com`
 - **Description**: Gmail SMTP server hostname
 
 ##### `SMTP_PORT`
+
 - **Type**: Integer
 - **Required**: If using Gmail
 - **Example**: `587`
 - **Description**: Gmail SMTP port (use 587 for TLS)
 
 ##### `SMTP_USER`
+
 - **Type**: String (email)
 - **Required**: If using Gmail
 - **Example**: `yourstore@gmail.com`
 - **Description**: Your Gmail address
 
 ##### `SMTP_PASSWORD`
+
 - **Type**: String
 - **Required**: If using Gmail
 - **Example**: `abcd efgh ijkl mnop`
 - **Description**: Gmail App Password (NOT your regular password). Generate at: https://myaccount.google.com/apppasswords
 
 ##### `SMTP_FROM`
+
 - **Type**: String (email)
 - **Required**: If using Gmail
 - **Example**: `yourstore@gmail.com`
@@ -71,12 +79,14 @@ Choose **one** email provider:
 #### Option 2: SendGrid
 
 ##### `SENDGRID_API_KEY`
+
 - **Type**: String
 - **Required**: If using SendGrid
 - **Example**: `SG.xxx-yyy-zzz`
 - **Description**: SendGrid API key. Get from: https://app.sendgrid.com/settings/api_keys
 
 ##### `SENDGRID_FROM_EMAIL`
+
 - **Type**: String (email)
 - **Required**: If using SendGrid
 - **Example**: `noreply@yourdomain.com`
@@ -85,6 +95,7 @@ Choose **one** email provider:
 ### Sentry Error Tracking
 
 #### `NEXT_PUBLIC_SENTRY_DSN`
+
 - **Type**: String (URL)
 - **Required**: Recommended
 - **Example**: `https://abc123@o123456.ingest.sentry.io/7890123`
@@ -92,6 +103,7 @@ Choose **one** email provider:
 - **Used By**: Frontend, Backend
 
 #### `SENTRY_AUTH_TOKEN`
+
 - **Type**: String
 - **Required**: For CI/CD source maps
 - **Example**: `sntrys_abc123def456`
@@ -102,6 +114,7 @@ Choose **one** email provider:
 ### Application Configuration
 
 #### `APP_NAME`
+
 - **Type**: String
 - **Required**: No
 - **Default**: `Insight`
@@ -109,6 +122,7 @@ Choose **one** email provider:
 - **Description**: Application name shown in UI and emails
 
 #### `APP_URL`
+
 - **Type**: String (URL)
 - **Required**: No (but recommended for production)
 - **Default**: `http://localhost:3000`
@@ -116,6 +130,7 @@ Choose **one** email provider:
 - **Description**: Public URL of your application. Used for email links and PWA manifest.
 
 #### `NODE_ENV`
+
 - **Type**: String enum
 - **Required**: No
 - **Default**: `development`
@@ -125,6 +140,7 @@ Choose **one** email provider:
 ### Backend Configuration
 
 #### `PYTHON_API_PORT`
+
 - **Type**: Integer
 - **Required**: No
 - **Default**: `8000`
@@ -132,6 +148,7 @@ Choose **one** email provider:
 - **Description**: Port for Python FastAPI server
 
 #### `PYTHON_ENV`
+
 - **Type**: String enum
 - **Required**: No
 - **Default**: `development`
@@ -141,6 +158,7 @@ Choose **one** email provider:
 ### Cache Configuration
 
 #### `ENABLE_SQLITE_CACHE`
+
 - **Type**: Boolean
 - **Required**: No
 - **Default**: `true`
@@ -148,6 +166,7 @@ Choose **one** email provider:
 - **Description**: Enable optional SQLite cache for offline capability and faster reads
 
 #### `CACHE_RETENTION_DAYS`
+
 - **Type**: Integer
 - **Required**: No
 - **Default**: `7`
@@ -157,6 +176,7 @@ Choose **one** email provider:
 ### Monitoring & Alerts
 
 #### `ALERT_EMAIL`
+
 - **Type**: String (email)
 - **Required**: No
 - **Default**: Same as `SMTP_FROM`
@@ -164,6 +184,7 @@ Choose **one** email provider:
 - **Description**: Email address to receive system alerts and summaries
 
 #### `WEEKLY_SUMMARY_EMAIL`
+
 - **Type**: Boolean
 - **Required**: No
 - **Default**: `true`
@@ -173,12 +194,14 @@ Choose **one** email provider:
 ### Basic Authentication (Production)
 
 #### `BASIC_AUTH_USER`
+
 - **Type**: String
 - **Required**: For production
 - **Example**: `admin`
 - **Description**: Username for Nginx basic authentication
 
 #### `BASIC_AUTH_PASSWORD`
+
 - **Type**: String
 - **Required**: For production
 - **Example**: `SuperSecure123!`
@@ -187,6 +210,7 @@ Choose **one** email provider:
 ## Environment-Specific Configurations
 
 ### Development (.env.local)
+
 ```env
 NODE_ENV=development
 PYTHON_ENV=development
@@ -196,6 +220,7 @@ WEEKLY_SUMMARY_EMAIL=false
 ```
 
 ### Staging (.env.staging)
+
 ```env
 NODE_ENV=production
 PYTHON_ENV=staging
@@ -205,6 +230,7 @@ WEEKLY_SUMMARY_EMAIL=true
 ```
 
 ### Production (.env.production)
+
 ```env
 NODE_ENV=production
 PYTHON_ENV=production
@@ -226,24 +252,28 @@ BASIC_AUTH_PASSWORD=<strong-password>
 ## Getting Credentials
 
 ### Supabase
+
 1. Go to https://supabase.com/dashboard
 2. Select your project
 3. Navigate to Settings → API
 4. Copy `URL`, `anon public`, and `service_role` keys
 
 ### Gmail App Password
+
 1. Enable 2FA on your Google account
 2. Visit https://myaccount.google.com/apppasswords
 3. Generate new app password for "Mail"
 4. Copy 16-character password (format: `xxxx xxxx xxxx xxxx`)
 
 ### SendGrid
+
 1. Sign up at https://sendgrid.com (100 emails/day free)
 2. Verify sender email
 3. Navigate to Settings → API Keys
 4. Create new API key with "Mail Send" permissions
 
 ### Sentry
+
 1. Sign up at https://sentry.io (5k errors/month free)
 2. Create new project → Select "Next.js" and "Python"
 3. Copy DSN from project settings
@@ -252,17 +282,20 @@ BASIC_AUTH_PASSWORD=<strong-password>
 ## Troubleshooting
 
 ### Supabase Connection Errors
+
 - Verify URL and keys match Supabase dashboard
 - Check if project is paused (free tier pauses after 7 days inactivity)
 - Ensure Row Level Security policies allow access
 
 ### Email Not Sending
+
 - **Gmail**: Verify App Password is correct (not regular password)
 - **Gmail**: Check "Less secure app access" is enabled (if using old method)
 - **SendGrid**: Verify sender email is verified
 - **Both**: Check spam folder
 
 ### Sentry Not Logging
+
 - Verify DSN is correct
 - Check Sentry project is active
 - Ensure error rate hasn't exceeded free tier (5k/month)
@@ -270,6 +303,7 @@ BASIC_AUTH_PASSWORD=<strong-password>
 ## Next Steps
 
 After setting up environment variables:
+
 1. ✅ Create `.env` file from `.env.example`
 2. ✅ Fill in all required credentials
 3. ✅ Test connections: `npm run test:env` (coming soon)

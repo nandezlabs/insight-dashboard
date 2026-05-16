@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useCreate } from "@refinedev/core";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useOne, useUpdate } from "@refinedev/core";
 import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
 import Link from "next/link";
 
@@ -15,13 +15,54 @@ interface FormField {
   options?: string[];
 }
 
-export default function NewFormPage() {
+interface FormTemplate {
+  id: string;
+  name: string;
+  version: number;
+  schema: any;
+  status: "draft" | "active" | "archived";
+}
+
+export default function EditFormPage() {
+  const params = useParams();
   const router = useRouter();
-  const { mutate: createForm, isLoading } = useCreate();
+  const formId = params.id as string;
+
+  const { query } = useOne<FormTemplate>({
+    resource: "form_templates",
+    id: formId,
+  });
+
+  const { mutate: updateForm, isLoading: isSaving } = useUpdate();
 
   const [formName, setFormName] = useState("");
   const [formStatus, setFormStatus] = useState<"draft" | "active">("draft");
   const [fields, setFields] = useState<FormField[]>([]);
+
+  const form = query.data?.data;
+
+  // Load form data when available
+  useEffect(() => {
+    if (form) {
+      setFormName(form.name);
+      setFormStatus(form.status as "draft" | "active");
+
+      // Parse existing schema into editable fields
+      if (form.schema?.components) {
+        const parsedFields: FormField[] = form.schema.components.map(
+          (comp: any) => ({
+            key: comp.key,
+            label: comp.label,
+            type: comp.type,
+            required: comp.validate?.required || false,
+            placeholder: comp.placeholder || "",
+            options: comp.data?.values?.map((v: any) => v.label) || [],
+          }),
+        );
+        setFields(parsedFields);
+      }
+    }
+  }, [form]);
 
   const addField = () => {
     setFields([
@@ -57,14 +98,12 @@ export default function NewFormPage() {
       return;
     }
 
-    // Validate all fields have labels
     const invalidFields = fields.filter((f) => !f.label.trim());
     if (invalidFields.length > 0) {
       alert("All fields must have labels");
       return;
     }
 
-    // Create FormIO.js schema
     const schema = {
       components: fields.map((field) => ({
         key: field.key,
@@ -86,9 +125,10 @@ export default function NewFormPage() {
       })),
     };
 
-    createForm(
+    updateForm(
       {
         resource: "form_templates",
+        id: formId,
         values: {
           name: formName,
           schema,
@@ -100,12 +140,47 @@ export default function NewFormPage() {
           router.push("/forms");
         },
         onError: (error) => {
-          console.error("Error creating form:", error);
-          alert("Failed to create form. Please try again.");
+          console.error("Error updating form:", error);
+          alert("Failed to update form. Please try again.");
         },
       },
     );
   };
+
+  if (query.isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading form...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (query.isError || !form) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <h2 className="text-lg font-semibold text-red-800 mb-2">
+              Form Not Found
+            </h2>
+            <p className="text-red-600 mb-4">
+              The form you're trying to edit doesn't exist.
+            </p>
+            <Link
+              href="/forms"
+              className="inline-flex items-center text-red-700 hover:text-red-900"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Forms
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -121,27 +196,26 @@ export default function NewFormPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Link>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  Create New Form
-                </h1>
+                <h1 className="text-3xl font-bold text-gray-900">Edit Form</h1>
                 <p className="mt-1 text-sm text-gray-500">
-                  Build your form by adding fields
+                  Version {form.version} - Changes will create version{" "}
+                  {form.version + 1}
                 </p>
               </div>
             </div>
             <button
               onClick={handleSave}
-              disabled={isLoading}
+              disabled={isSaving}
               className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors"
             >
               <Save className="w-5 h-5 mr-2" />
-              {isLoading ? "Saving..." : "Save Form"}
+              {isSaving ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Content - Reuse the same builder UI from new form */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form Builder */}

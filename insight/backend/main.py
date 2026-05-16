@@ -38,12 +38,14 @@ app.add_middleware(
 )
 
 # Import routers
-from api import health, forms, submissions
+from api import health, forms, submissions, exports, analytics
 
 # Register routers
 app.include_router(health.router, tags=["health"])
 app.include_router(forms.router, prefix="/api", tags=["forms"])
 app.include_router(submissions.router, prefix="/api", tags=["submissions"])
+app.include_router(exports.router, tags=["exports"])
+app.include_router(analytics.router, tags=["analytics"])
 
 @app.get("/")
 async def root():

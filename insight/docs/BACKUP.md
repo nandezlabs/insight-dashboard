@@ -21,6 +21,7 @@ Supabase provides automatic daily backups on the free tier:
 - **No action required**: Automatic
 
 **Access Backups**:
+
 1. Go to Supabase Dashboard → Database → Backups
 2. View available backup points
 3. Restore from any point within 7 days
@@ -133,14 +134,14 @@ files = supabase.storage.from_("uploads").list()
 for file in files:
     # Download each file
     data = supabase.storage.from_("uploads").download(file["name"])
-    
+
     # Save to backup directory
     filepath = Path(BACKUP_DIR) / file["name"]
     filepath.parent.mkdir(parents=True, exist_ok=True)
-    
+
     with open(filepath, "wb") as f:
         f.write(data)
-    
+
     print(f"Backed up: {file['name']}")
 ```
 
@@ -252,6 +253,7 @@ python scripts/restore_files.py
 **Symptoms**: Application errors, missing data, SQL errors in logs
 
 **Recovery Steps**:
+
 1. Identify last known good backup point
 2. Stop application services
 3. Restore from Supabase automatic backup (if within 7 days)
@@ -267,6 +269,7 @@ python scripts/restore_files.py
 **Symptoms**: Cannot SSH, VPS unreachable, hardware failure
 
 **Recovery Steps**:
+
 1. Provision new VPS (follow SETUP.md)
 2. Clone repository from GitHub
 3. Restore environment variables from encrypted backup
@@ -286,14 +289,17 @@ python scripts/restore_files.py
 **Recovery Options**:
 
 **Option A**: Restore from last night's automatic backup (if within 7 days)
+
 - **Pros**: Quick, easy
 - **Cons**: Loses data created after backup
 
 **Option B**: Restore specific table from manual backup
+
 - **Pros**: Surgical, only affects deleted data
 - **Cons**: More complex, requires SQL knowledge
 
 **Option C**: If caught quickly, restore from SQLite cache (if enabled)
+
 - **Pros**: Most recent data
 - **Cons**: Only works if cache hasn't been cleared
 
@@ -302,6 +308,7 @@ python scripts/restore_files.py
 **Symptoms**: Cannot connect to database, Supabase status page shows issues
 
 **Recovery Steps**:
+
 1. Check Supabase status: https://status.supabase.com
 2. If outage is confirmed:
    - Enable "offline mode" in application (shows cached data)
@@ -320,6 +327,7 @@ python scripts/restore_files.py
 **Symptoms**: Strange files, unauthorized access, encrypted files
 
 **Recovery Steps**:
+
 1. **DO NOT PAY RANSOM**
 2. Immediately disconnect VPS from network
 3. Report to Hostinger support
@@ -385,12 +393,14 @@ chmod 600 /home/insight/backups/*
 ## 📋 Backup Checklist
 
 ### Weekly Tasks
+
 - [ ] Verify automatic Supabase backup completed
 - [ ] Run manual `pg_dump` backup script
 - [ ] Check backup file size (should be consistent)
 - [ ] Verify backup uploaded to cloud storage
 
 ### Monthly Tasks
+
 - [ ] Test restore procedure (on staging environment)
 - [ ] Backup files from Supabase Storage
 - [ ] Review backup storage usage
@@ -398,6 +408,7 @@ chmod 600 /home/insight/backups/*
 - [ ] Update disaster recovery documentation
 
 ### Quarterly Tasks
+
 - [ ] Full disaster recovery drill
 - [ ] Rotate encryption keys
 - [ ] Archive old backups to long-term storage

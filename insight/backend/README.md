@@ -5,17 +5,20 @@ Python FastAPI backend for the Insight Dashboard application.
 ## Setup
 
 1. **Create virtual environment**:
+
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 2. **Install dependencies**:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 3. **Configure environment**:
+
    ```bash
    cp ../.env.example .env
    # Edit .env with your Supabase credentials
@@ -27,6 +30,7 @@ Python FastAPI backend for the Insight Dashboard application.
    ```
 
 API will be available at:
+
 - http://localhost:8000
 - Docs: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
@@ -34,9 +38,11 @@ API will be available at:
 ## API Endpoints
 
 ### Health Check
+
 - `GET /health` - Check API health and Supabase connection
 
 ### Coming Soon
+
 - `/api/submissions` - Form submission management
 - `/api/exports` - Export generation (CSV, Excel, PDF)
 - `/api/analytics` - Analytics and completion tracking
