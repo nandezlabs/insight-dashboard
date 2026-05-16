@@ -46,13 +46,13 @@ export default function EditFormPage() {
       setFormStatus(formData.data.status || "draft");
 
       // Import Survey Creator dynamically on client side
-      import("survey-creator-core").then((SurveyCreator) => {
+      import("survey-creator-core").then(({ SurveyCreator }) => {
         const options = {
           showLogicTab: true,
           showTranslationTab: false,
           showJSONEditorTab: false,
         };
-        const creatorInstance = new SurveyCreator.SurveyCreator(options);
+        const creatorInstance = new SurveyCreator(options);
         
         // Load existing schema or create default
         const existingSchema = formData.data.schema || {

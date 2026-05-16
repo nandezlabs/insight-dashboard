@@ -32,13 +32,13 @@ export default function NewFormPage() {
     
     // Import Survey Creator dynamically on client side
     if (typeof window !== "undefined") {
-      import("survey-creator-core").then((SurveyCreator) => {
+      import("survey-creator-core").then(({ SurveyCreator }) => {
         const options = {
           showLogicTab: true,
           showTranslationTab: false,
           showJSONEditorTab: false,
         };
-        const creatorInstance = new SurveyCreator.SurveyCreator(options);
+        const creatorInstance = new SurveyCreator(options);
         creatorInstance.JSON = {
           pages: [
             {
