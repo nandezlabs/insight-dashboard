@@ -33,7 +33,6 @@ export default function EditFormPage() {
 
   const { mutate: updateForm, isLoading: isUpdating } = useUpdate();
 
-  const [formName, setFormName] = useState("");
   const [formStatus, setFormStatus] = useState<"draft" | "active">("draft");
   const [creator, setCreator] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
@@ -47,7 +46,6 @@ export default function EditFormPage() {
     if (formData?.data && typeof window !== "undefined" && !creatorInitialized.current) {
       creatorInitialized.current = true;
       
-      setFormName(formData.data.name || "");
       setFormStatus(formData.data.status || "draft");
 
       // Import Survey Creator dynamically on client side
@@ -79,24 +77,21 @@ export default function EditFormPage() {
   }, [formData]);
 
   const handleSave = () => {
-    if (!formName.trim()) {
-      alert("Please enter a form name");
-      return;
-    }
-
     if (!creator) {
       alert("Form builder is still loading");
       return;
     }
 
     const schema = creator.JSON;
+    // Get the survey title from Survey.js schema, fallback to "Untitled Form"
+    const surveyTitle = schema.title?.trim() || "Untitled Form";
 
     updateForm(
       {
         resource: "form_templates",
         id: formId,
         values: {
-          name: formName,
+          name: surveyTitle,
           schema: schema,
           status: formStatus,
         },
@@ -157,23 +152,16 @@ export default function EditFormPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Form Settings */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Form Settings
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center justify-between">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Form Name *
-              </label>
-              <input
-                type="text"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                placeholder="e.g., Inventory Check Form"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <h2 className="text-lg font-semibold text-gray-900">
+                Publish Settings
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Set the survey title in the builder below. Use this to control publishing.
+              </p>
             </div>
-            <div>
+            <div className="w-48">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Status
               </label>
